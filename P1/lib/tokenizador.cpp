@@ -1,5 +1,4 @@
-#include "../include/tokenizador.h"
-//#include "tokenizador.h"
+#include "tokenizador.h"
 
     std::ostream& operator<<(std::ostream& os, const Tokenizador& tokenizador){
         os<< "DELIMITADORES: " << tokenizador.delimiters << " TRATA CASOS ESPECIALES: " 
