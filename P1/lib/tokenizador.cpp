@@ -1,4 +1,5 @@
 #include "tokenizador.h"
+#include <algorithm>
 
     std::ostream& operator<<(std::ostream& os, const Tokenizador& tokenizador){
         os<< "DELIMITADORES: " << tokenizador.delimiters << " TRATA CASOS ESPECIALES: " 
@@ -42,13 +43,35 @@
     // bool Tokenizar (const std::string & i) const;
     // bool TokenizarListaFicheros (const std::string& i) const;
     // bool TokenizarDirectorio (const std::string& i) const;
-    // void DelimitadoresPalabra(const std::string& nuevoDelimiters);
-    // void AnyadirDelimitadoresPalabra(const std::string& nuevoDelimiters);
-    // std::string DelimitadoresPalabra() const;
-    // void CasosEspeciales (const bool& nuevoCasosEspeciales);
-    // bool CasosEspeciales ();
-    // void PasarAminuscSinAcentos (const bool& nuevoPasarAminuscSinAcentos);
-    // bool PasarAminuscSinAcentos ();
-    // std::string delimiters;
-    // bool casosEspeciales;
-    // bool pasarAminuscSinAcentos;
+
+    void Tokenizador::DelimitadoresPalabra(const std::string& nuevoDelimiters){
+         
+    }
+    
+    void Tokenizador::AnyadirDelimitadoresPalabra(const std::string& nuevoDelimiters){
+
+        //COMPROBAR QUE ESTO ESTE BIEN!!!!!!!!!!!!!
+        //this->delimiters += nuevoDelimiters;
+        //this->delimiters = std::string(delimiters.begin(), std::unique(delimiters.begin(),delimiters.end()));
+
+    }
+
+    std::string Tokenizador::DelimitadoresPalabra() const{
+        return this->delimiters;
+    }
+    
+    void Tokenizador::CasosEspeciales (const bool& nuevoCasosEspeciales){
+        this->casosEspeciales = nuevoCasosEspeciales;
+    }
+
+    bool Tokenizador::CasosEspeciales (){
+        return this->casosEspeciales;
+    }
+
+    void Tokenizador::PasarAminuscSinAcentos (const bool& nuevoPasarAminuscSinAcentos){
+        this->pasarAminuscSinAcentos = nuevoPasarAminuscSinAcentos;
+    }
+
+    bool Tokenizador::PasarAminuscSinAcentos (){
+        return this->pasarAminuscSinAcentos;
+    }
