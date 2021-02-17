@@ -139,6 +139,10 @@ class Tokenizador {
 
         // Si true pasará el token a minúsculas y quitará acentos, antes de realizar la tokenización
         bool pasarAminuscSinAcentos;
+
+        //Funcion para comprobar si un delimitador ya esta inculido
+        bool Repetido(const char&);
+        
         
 };
 

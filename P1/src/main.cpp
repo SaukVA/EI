@@ -19,8 +19,14 @@ double getcputime(void) {
 }
 
 main() {
-    long double aa=getcputime();
-    Tokenizador a("\t ,;:.-+/*_`'{}[]()!?&#\"\\<>", true, true);
-    a.TokenizarListaFicheros("listaFicheros.txt");
-    cout << "Ha tardado " << getcputime() - aa << " segundos" << endl;
+    // long double aa=getcputime();
+    // Tokenizador a("\t ,;:.-+/*_`'{}[]()!?&#\"\\<>", true, true);
+    // a.TokenizarListaFicheros("listaFicheros.txt");
+    // cout << "Ha tardado " << getcputime() - aa << " segundos" << endl;
+
+    Tokenizador a;
+    a.DelimitadoresPalabra("[]()<>¡!¿?&#=\t\n\r@");
+
+    return 0;
+
 }

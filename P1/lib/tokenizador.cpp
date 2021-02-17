@@ -1,5 +1,5 @@
 #include "tokenizador.h"
-#include <algorithm>
+#include <bits/stdc++.h> 
 
     std::ostream& operator<<(std::ostream& os, const Tokenizador& tokenizador){
         os<< "DELIMITADORES: " << tokenizador.delimiters << " TRATA CASOS ESPECIALES: " 
@@ -7,8 +7,6 @@
         return os;
     }
 
-    // Tokenizador (const std::string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
-    
     Tokenizador::Tokenizador (const Tokenizador& tokenizador){
         // Comprobamos que no se este igualando el objeto a si mismo 
         if(this != &tokenizador){
@@ -19,7 +17,7 @@
     }
 
     Tokenizador::Tokenizador (){
-        this->delimiters = ",;:.-/+*\\ '\"{}[]()<>Â¡!Â¿?&#=\t\n\r@"; 
+        this->delimiters = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@"; 
         this->casosEspeciales  = true; 
         this->pasarAminuscSinAcentos = false;
     }
@@ -38,6 +36,7 @@
         return *this;
     }
 
+    // Tokenizador (const std::string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
     // void Tokenizar (const std::string& str, std::list<std::string>& tokens) const;
     // bool Tokenizar (const std::string& i, const std::string& f) const;
     // bool Tokenizar (const std::string & i) const;
@@ -45,15 +44,25 @@
     // bool TokenizarDirectorio (const std::string& i) const;
 
     void Tokenizador::DelimitadoresPalabra(const std::string& nuevoDelimiters){
-         
+        std::cout << "Primeros delimitadores:\t" << delimiters << std::endl;
+        this->delimiters = ""; 
+        this->AnyadirDelimitadoresPalabra(nuevoDelimiters);
     }
     
     void Tokenizador::AnyadirDelimitadoresPalabra(const std::string& nuevoDelimiters){
 
-        //COMPROBAR QUE ESTO ESTE BIEN!!!!!!!!!!!!!
-        //this->delimiters += nuevoDelimiters;
-        //this->delimiters = std::string(delimiters.begin(), std::unique(delimiters.begin(),delimiters.end()));
+        //std::cout << "Delimitadores actuales:\t" << this->delimiters << std::endl;
 
+        uint16_t n;
+        n = nuevoDelimiters.length();
+
+        for (size_t i = 0; i < n; i++){
+            if(!this->Repetido(nuevoDelimiters[i])){
+                this-> delimiters += nuevoDelimiters[i];
+            }
+        }
+
+        //std::cout << "Delimitadores nuevos:\t" << this->delimiters << std::endl;
     }
 
     std::string Tokenizador::DelimitadoresPalabra() const{
@@ -74,4 +83,13 @@
 
     bool Tokenizador::PasarAminuscSinAcentos (){
         return this->pasarAminuscSinAcentos;
+    }
+
+    bool Tokenizador::Repetido(const char& delimitador){
+        bool sol;
+        sol = false;
+
+        if(this->delimiters.find(delimitador) != std::string::npos){ sol = true; }
+
+        return sol;
     }
