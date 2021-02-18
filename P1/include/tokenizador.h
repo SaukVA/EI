@@ -140,10 +140,14 @@ class Tokenizador {
         // Si true pasará el token a minúsculas y quitará acentos, antes de realizar la tokenización
         bool pasarAminuscSinAcentos;
 
-        //Funcion para comprobar si un delimitador ya esta inculido
-        bool Repetido(const char&);
-        
-        
+        //Funcion para comprobar si existe el caracter dentro del string 
+        bool Contiene(const std::string&, const char&);
+
+        //Nos convierte un string a uno identico pero quita los acentos y las mayucaulas.
+        std::string MinuscSinAcentos(const std::string&) const;   
+
+        //Comprueba si el token es una URL
+        bool esURL(const std::string&);
 };
 
 #endif

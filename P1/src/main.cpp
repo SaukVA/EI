@@ -24,8 +24,9 @@ main() {
     // a.TokenizarListaFicheros("listaFicheros.txt");
     // cout << "Ha tardado " << getcputime() - aa << " segundos" << endl;
 
-    Tokenizador a;
-    a.DelimitadoresPalabra("[]()<>¡!¿?&#=\t\n\r@");
+    Tokenizador a("\t ,;:.-+/*_`'{}[]()!?&#\"\\<>", true, true);
+    std::list<std::string> tokens;
+    a.Tokenizar("ÀÁàá ÈÉèé ÌÍìí ÒÓòó ÙÚùú HOLA MUNDO ENCANTADO DE CONOCERTE", tokens);
 
     return 0;
 
