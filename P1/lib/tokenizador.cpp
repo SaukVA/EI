@@ -56,14 +56,39 @@
 
         //Comprobamos si tenemos que detectar casos especiales
         if(!casosEspeciales){
-            std::string::size_type lastPos  = copia_str.find_first_not_of(delimiters,0);
-            std::string::size_type pos      = copia_str.find_first_of(delimiters,lastPos);
+            std::string::size_type lastPos  = copia_str.find_first_not_of(delimiters,0);    // Posicion del primer caracter del Token
+            std::string::size_type pos      = copia_str.find_first_of(delimiters,lastPos);  // Posicion del primer delimitador
 
             while(std::string::npos != pos || std::string::npos != lastPos){
                 tokens.push_back(copia_str.substr(lastPos, pos - lastPos));
                 lastPos = copia_str.find_first_not_of(delimiters, pos);
                 pos     = copia_str.find_first_of(delimiters, lastPos);
             }
+        }
+        else{
+            std::string delimitersAux, delimitersURL, delimitersNum;
+            delimitersAux = delimiters + " ";                                                  // Delimitadores que se comprueban el ultima instancia 
+            delimitersURL = Substraer(delimitersAux, "_:/.?&-=#@");                            // Delimitadores que acepta la URL
+            delimitersNum = Substraer(delimitersAux, ",.$%");                                  // Delimitadores que utiliza un numero
+            std::string::size_type lastPos  = copia_str.find_first_not_of(delimitersAux,0);    // Posicion del primer caracter del Token
+            std::string::size_type pos      = copia_str.find_first_of(delimitersAux,lastPos);  // Posicion del primer delimitador
+
+            while(std::string::npos != pos || std::string::npos != lastPos){
+                if(esURL(pos, lastPos, copia_str)){
+                    pos     = copia_str.find_first_of(delimitersURL,lastPos);
+                    tokens.push_back(copia_str.substr(lastPos, pos - lastPos));
+                    lastPos = copia_str.find_first_not_of(delimitersAux, pos);
+                    pos     = copia_str.find_first_of(delimitersAux, lastPos);
+                }
+                else if(esNumero(pos, lastPos, str, delimitersNum)){
+
+                }
+                else{
+                    tokens.push_back(copia_str.substr(lastPos, pos - lastPos));
+                    lastPos = copia_str.find_first_not_of(delimitersAux, pos);
+                    pos     = copia_str.find_first_of(delimitersAux, lastPos);
+                }
+            }    
         }
     }
 
@@ -83,10 +108,11 @@
         n = nuevoDelimiters.length();
 
         for (size_t i = 0; i < n; i++){
-            if(!this->Contiene(this->delimiters, nuevoDelimiters[i])){
+            if(!Contiene(delimiters, nuevoDelimiters[i])){
                 this-> delimiters += nuevoDelimiters[i];
             }
         }
+        //std::cout << "Delimitadores nuevo:\t" << delimiters << std::endl;
     }
 
     std::string Tokenizador::DelimitadoresPalabra() const{
@@ -176,6 +202,30 @@
         return minSin_str;
     }
 
-    bool Tokenizador::esURL(const std::string& token){
-        return true;
+    std::string Tokenizador::Substraer(const std::string& str, const std::string& delet) const{
+        std::string result;
+        result = str;
+
+        for (size_t i = 0; i < delet.length(); i++){
+             result.erase(remove(result.begin(), result.end(), delet[i]), result.end());
+        }
+
+        return result;
     }
+
+    bool Tokenizador::esURL(const std::string::size_type& pos, const std::string::size_type& lastPos, const std::string& str)const{
+        return  (
+                    str.find("http:")  == lastPos ||
+                    str.find("https:") == lastPos ||
+                    str.find("ftp:")   == lastPos
+                );
+    }
+
+    bool Tokenizador::esNumero(const std::string::size_type& pos, const std::string::size_type& lastPos, const std::string& str, const std::string& del)const{
+        bool resul;
+        resul = false;
+
+        return resul;
+    }
+
+    

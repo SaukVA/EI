@@ -141,13 +141,21 @@ class Tokenizador {
         bool pasarAminuscSinAcentos;
 
         //Funcion para comprobar si existe el caracter dentro del string 
-        bool Contiene(const std::string&, const char&);
+        bool Contiene(const std::string& conjunto, const char& elemento);
 
         //Nos convierte un string a uno identico pero quita los acentos y las mayucaulas.
-        std::string MinuscSinAcentos(const std::string&) const;   
+        std::string MinuscSinAcentos(const std::string& str) const;   
+
+        //Devuelve un string con los delimitadores que nos sirven para delimitar los tokens
+        std::string Substraer(const std::string& str, const std::string& delet) const;
 
         //Comprueba si el token es una URL
-        bool esURL(const std::string&);
+        bool esURL(const std::string::size_type& pos, const std::string::size_type& lasPos, const std::string& str) const;
+
+        //Comprueba si el token es una URL
+        bool esNumero(const std::string::size_type& pos, const std::string::size_type& lasPos, const std::string& str, const std::string& del) const;
+
+
 };
 
 #endif
