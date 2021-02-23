@@ -23,7 +23,7 @@
     }
 
     Tokenizador::Tokenizador (){
-        this->delimiters             = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@"; 
+        this->delimiters             = ",;:.-/+*\\ '\"{}[]()<>?!??&#=\t\n\r@"; 
         this->casosEspeciales        = true; 
         this->pasarAminuscSinAcentos = false;
     }
@@ -69,25 +69,39 @@
             std::string delimitersAux, delimitersURL, delimitersNum;
             delimitersAux = delimiters + " ";                                                  // Delimitadores que se comprueban el ultima instancia 
             delimitersURL = Substraer(delimitersAux, "_:/.?&-=#@");                            // Delimitadores que acepta la URL
-            delimitersNum = Substraer(delimitersAux, ",.$%");                                  // Delimitadores que utiliza un numero
+            delimitersNum = Substraer(delimitersAux, ",.%$") + "%$";                           // Delimitadores que acepta un numero
             std::string::size_type lastPos  = copia_str.find_first_not_of(delimitersAux,0);    // Posicion del primer caracter del Token
             std::string::size_type pos      = copia_str.find_first_of(delimitersAux,lastPos);  // Posicion del primer delimitador
 
             while(std::string::npos != pos || std::string::npos != lastPos){
+                //Comprobamos si es una URL
                 if(esURL(pos, lastPos, copia_str)){
                     pos     = copia_str.find_first_of(delimitersURL,lastPos);
                     tokens.push_back(copia_str.substr(lastPos, pos - lastPos));
-                    lastPos = copia_str.find_first_not_of(delimitersAux, pos);
-                    pos     = copia_str.find_first_of(delimitersAux, lastPos);
                 }
-                else if(esNumero(pos, lastPos, str, delimitersNum)){
-
+                //Comprobamos si es una Numero 
+                else if(esNumero(pos, lastPos, copia_str, delimitersNum)){
+                    pos     = copia_str.find_first_of(delimitersNum,lastPos);
+                    if(copia_str[lastPos-1] == '.' || copia_str[lastPos-1] == ','){
+                        Procesar(tokens, "0" + copia_str.substr(lastPos-1, pos - (lastPos-1)));
+                    } 
+                    else{
+                        Procesar(tokens, copia_str.substr(lastPos, pos - lastPos));
+                    }
+                    //Si se termina por '%' o '$' sw a?ade eso como un token extra
+                    if(copia_str[pos] == '$' || copia_str[pos] == '%'){
+                        std::string temp;
+                        temp = copia_str[pos];
+                        tokens.push_back(temp);
+                        ++pos;
+                    }
                 }
                 else{
                     tokens.push_back(copia_str.substr(lastPos, pos - lastPos));
-                    lastPos = copia_str.find_first_not_of(delimitersAux, pos);
-                    pos     = copia_str.find_first_of(delimitersAux, lastPos);
                 }
+
+                lastPos = copia_str.find_first_not_of(delimitersAux, pos);
+                pos     = copia_str.find_first_of(delimitersAux, lastPos);
             }    
         }
     }
@@ -153,42 +167,42 @@
         for (size_t i = 0; i < str.length(); i++){
             unsigned char aux = str[i];
             switch (aux){
-                case 209:   // 'Ñ'
+                case 209:   // '?'
                     minSin_str += 'ñ';
                     break;
 
-                case 192:   // 'À'
-                case 193:   // 'Á'
-                case 224:   // 'à'
-                case 225:   // 'á'
+                case 192:   // '?'
+                case 193:   // '?'
+                case 224:   // '?'
+                case 225:   // '?'
                     minSin_str += 'a';               
                     break;
 
-                case 200:   // 'È'
-                case 201:   // 'É' 
-                case 232:   // 'è'
-                case 233:   // 'é'
+                case 200:   // '?'
+                case 201:   // '?' 
+                case 232:   // '?'
+                case 233:   // '?'
                     minSin_str += 'e';               
                     break;
                 
-                case 204:   // 'Ì'
-                case 205:   // 'Í'
-                case 236:   // 'ì'
-                case 237:   // 'í'
+                case 204:   // '?'
+                case 205:   // '?'
+                case 236:   // '?'
+                case 237:   // '?'
                     minSin_str += 'i';               
                     break;
 
-                case 210:   // 'Ò'
-                case 211:   // 'Ó' 
-                case 242:   // 'ò'
-                case 243:   // 'ó'
+                case 210:   // '?'
+                case 211:   // '?' 
+                case 242:   // '?'
+                case 243:   // '?'
                     minSin_str += 'o';               
                     break;
 
-                case 217:   // 'Ù'
-                case 218:   // 'Ú' 
-                case 249:   // 'ù'
-                case 250:   // 'ú'
+                case 217:   // '?'
+                case 218:   // '?' 
+                case 249:   // '?'
+                case 250:   // '?'
                     minSin_str += 'u';               
                     break;
             
@@ -213,6 +227,31 @@
         return result;
     }
 
+    void Tokenizador::Procesar(std::list<std::string>& tokens, const std::string& str)const{
+
+        std::string tok;
+        bool repetido;
+        tok = "";
+        repetido = false;
+
+
+        for (size_t i = 0; i < str.length(); i++){
+            if(str[i] != ',' && str[i] != '.'){ tok += str[i]; }
+            else if( tok != "" && (str[i+1] == ',' || str[i+1] == '.')){
+                tokens.push_back(tok);
+                tok = "";
+            }
+            else if (tok == "" && (str[i+1] != ',' && str[i+1] != '.')){
+                tok += '0';
+                tok += str[i];
+            }
+            else if (tok != ""){ tok += str[i]; }
+        }
+
+        if(tok != "" && tok != "0," && tok != "0."){tokens.push_back(tok);}
+        
+    }
+
     bool Tokenizador::esURL(const std::string::size_type& pos, const std::string::size_type& lastPos, const std::string& str)const{
         return  (
                     str.find("http:")  == lastPos ||
@@ -221,11 +260,20 @@
                 );
     }
 
-    bool Tokenizador::esNumero(const std::string::size_type& pos, const std::string::size_type& lastPos, const std::string& str, const std::string& del)const{
-        bool resul;
-        resul = false;
+    bool Tokenizador::esNumero(const std::string::size_type& pos, const std::string::size_type& lastPos, const std::string& str, std::string& del)const{
 
-        return resul;
+        std::string::size_type posAux;
+        std:: string strAux, delAux;
+        delAux = "0123456789";
+        posAux = str.find_first_of(del,lastPos);
+        strAux = str.substr(lastPos, posAux - lastPos);
+
+        if(delimiters.find_first_of(",",0) != std::string::npos) {delAux += ",";}
+        if(delimiters.find_first_of(".",0) != std::string::npos) {delAux += ".";}
+
+        return  (  strAux.find_first_not_of(delAux ,0)  == std::string::npos &&     //Comprobamos que no hayan caracteres
+                   strAux.find_first_of("012345678" ,0) != std::string::npos        //Comprobamos que almenos haya un numero 
+                );
     }
 
     

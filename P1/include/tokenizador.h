@@ -149,11 +149,15 @@ class Tokenizador {
         //Devuelve un string con los delimitadores que nos sirven para delimitar los tokens
         std::string Substraer(const std::string& str, const std::string& delet) const;
 
+        //Nos procesa la cadena de numeros
+        void Procesar(std::list<std::string>& tokens, const std::string& str) const;
+
         //Comprueba si el token es una URL
         bool esURL(const std::string::size_type& pos, const std::string::size_type& lasPos, const std::string& str) const;
 
-        //Comprueba si el token es una URL
-        bool esNumero(const std::string::size_type& pos, const std::string::size_type& lasPos, const std::string& str, const std::string& del) const;
+        //Comprueba si el token es un Numero
+        bool esNumero(const std::string::size_type& pos, const std::string::size_type& lasPos, const std::string& str, std::string& del) const;
+
 
 
 };
