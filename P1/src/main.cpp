@@ -24,9 +24,9 @@ main() {
     // a.TokenizarListaFicheros("listaFicheros.txt");
     // cout << "Ha tardado " << getcputime() - aa << " segundos" << endl;
 
-    Tokenizador a(",.", true, false);
+    Tokenizador a("@.,&", true, false);
     std::list<std::string> tokens;
-    a.Tokenizar("3..2$ 4,,,5$ ..35", tokens);
+    a.Tokenizar("pal1 10.35% 10,35% 23.000,3% 23,5$ 23.05$ 23,05$ 11.1$ 11.05$ 3.4% 4,3%", tokens);
     std::cout << "Numero de tokens:\t" << tokens.size() << std::endl;
     std::cout << "Tokens: " << std::endl;
     for (auto b = tokens.begin(), e = tokens.end(); b != e; ++b){
