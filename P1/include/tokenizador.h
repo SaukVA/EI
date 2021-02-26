@@ -161,7 +161,11 @@ class Tokenizador {
         //Comprueba si el token es un Email 
         bool esEmail(const std::string::size_type& pos, const std::string::size_type& lasPos, const std::string& str, std::string& del)const;
 
+        //Comprueba si el token es un Acronimo
+        bool esAcronimo(const std::string::size_type &lastPos, const std::string &str, const std::string &del, const std::string &delAux)const; 
 
+        //Comprueba si el token es una Multipalabra
+        bool esMultPalab(const std::string::size_type &lastPos, const std::string &str, const std::string &del, const std::string &delAux)const;
 };
 
 #endif

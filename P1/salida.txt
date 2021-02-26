@@ -1,2 +1,0 @@
-para cambiar el encoding de pinchar abajo a la derecha sobre UTF-8
-chcp 28591 --> cambiar el encoding del terminal 
