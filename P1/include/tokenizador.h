@@ -5,6 +5,9 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <cstdlib>
 
 class Tokenizador {
     /* 
@@ -150,22 +153,22 @@ class Tokenizador {
         std::string Substraer(const std::string& str, const std::string& delet) const;
 
         //Obtine la posicion del final del token
-        std::string::size_type Encontrar_final(const std::string::size_type& lasPos, const std::string& str, const std::string& del, const std::string& delAux)const;
+        std::string::size_type Encontrar_final(const std::string::size_type& lasPos, const std::string &str, const std::string &del)const;
 
         //Comprueba si el token es una URL
-        bool esURL(const std::string::size_type& lasPos, const std::string& str) const;
+        bool esURL(const std::string::size_type &lasPos, const std::string &str) const;
 
         //Comprueba si el token es un Numero
-        bool esNumero(const std::string::size_type& lasPos, const std::string& str, const std::string& del, const std::string& delAux) const;
+        bool esNumero(const std::string::size_type &lasPos, const std::string &str, const std::string &del, const std::string &delAux, std::string::size_type &pos) const;
 
         //Comprueba si el token es un Email 
-        bool esEmail(const std::string::size_type& pos, const std::string::size_type& lasPos, const std::string& str, std::string& del)const;
+        bool esEmail(const std::string::size_type &pos, const std::string::size_type &lasPos, const std::string &str, const std::string &del)const;
 
         //Comprueba si el token es un Acronimo
-        bool esAcronimo(const std::string::size_type &lastPos, const std::string &str, const std::string &del, const std::string &delAux)const; 
+        bool esAcronimo(const std::string::size_type &lastPos, const std::string &str, const std::string &del, const std::string &delAux, std::string::size_type &pos)const; 
 
         //Comprueba si el token es una Multipalabra
-        bool esMultPalab(const std::string::size_type &lastPos, const std::string &str, const std::string &del, const std::string &delAux)const;
+        bool esMultPalab(const std::string::size_type &lastPos, const std::string &str, const std::string &del, const std::string &delAux, std::string::size_type &pos)const;
 };
 
 #endif
