@@ -23,4 +23,12 @@ main() {
         a.TokenizarListaFicheros("listaFicheros.txt");
         // TODO EL CORPUS
         cout << "Ha tardado " << getcputime() - aa << " segundos" << endl;
+
+        // Tokenizador a("\t ,;:.-+/*_`'{}[]", true, true);
+        // list<string> token;
+        // a.Tokenizar("H”la MŸndo QuE·L ÏslA —Ò", token);
+        // cout << "Numero de Tokens:\t" << token.size()<< endl;
+        // for (auto const& i: token) {
+        //         cout << "\t" << i << endl;
+        // }
 }

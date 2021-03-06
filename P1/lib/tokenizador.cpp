@@ -105,7 +105,7 @@ void Tokenizador::Tokenizar(const std::string &str, std::list<std::string> &toke
             else if (esNumero(lastPos, copia_str, delimitersNum, delimitersAux, pos))
             {
                 //std::cout << "Soy un Numero" << std::endl;
-                //pos = Encontrar_final(lastPos, copia_str, delimitersNum);
+                pos = Encontrar_final(lastPos, copia_str, delimitersNum);
                 if (copia_str[lastPos - 1] == '.' || copia_str[lastPos - 1] == ',')
                 {
                     tokens.push_back('0' + copia_str.substr(lastPos - 1, pos - (lastPos - 1)));
@@ -129,7 +129,7 @@ void Tokenizador::Tokenizar(const std::string &str, std::list<std::string> &toke
             else if (esEmail(pos, lastPos, copia_str, delimitersMail))
             {
                 //std::cout << "Soy un Email" << std::endl;
-                pos = Encontrar_final(lastPos, copia_str, delimitersMail);
+                pos = Encontrar_final(lastPos, copia_str, delimitersAux);
                 tokens.push_back(copia_str.substr(lastPos, pos - lastPos));
             }
 
@@ -168,11 +168,11 @@ bool Tokenizador::Tokenizar(const std::string &i, const std::string &f) const
     std::ifstream i_file;
     std::ofstream f_file;
     std::list<std::string> tokens;
-    std::string str;
+    std::string str, temp;
 
     resul = false;
-    i_file.open(i.c_str());
-    f_file.open(f.c_str());
+    i_file.open(i.c_str(), std::ios::binary);
+    f_file.open(f.c_str(), std::ios::binary);
 
     if (!i_file)
     {
@@ -181,19 +181,47 @@ bool Tokenizador::Tokenizar(const std::string &i, const std::string &f) const
 
     else
     {
-        while (std::getline(i_file, str))
+        std::stringstream strStream;
+        strStream << i_file.rdbuf();
+        while (std::getline(strStream, str, '\n'))
         {
             Tokenizar(str, tokens);
-            for (std::string const &token : tokens)
-            {
-                f_file << token << std::endl;
+            for (std::string const &token : tokens){ 
+                temp += token + "\n";
             }
         }
+        f_file << temp;
         resul = true;
     }
 
     i_file.close();
     f_file.close();
+
+    // bool resul = false;
+    // std::list<std::string> tokens;
+    // std::string str, temp;
+    // std::ofstream ffs(f.c_str(), std::ios::binary);
+    // std::ifstream ifs(i.c_str(), std::ios::binary);
+    // std::string content( (std::istreambuf_iterator<char>(ifs) ),
+    //                      (std::istreambuf_iterator<char>()    ) );
+
+    // if (!ifs)
+    // {
+    //     std::cerr << "ERROR: No existe el archivo: " << i << std::endl;
+    // }
+
+    // else{
+    //     std::stringstream contSt (content);
+    //     while(getline(contSt, str, '\n'))
+    //     {
+    //         Tokenizar(str, tokens);
+    //         for (std::string const &token : tokens){ 
+    //             temp += token + "\n";
+    //         }
+    //     }
+    //         ffs << temp;
+    //         resul = true;
+    // }
 
     return resul;
 }
@@ -204,19 +232,44 @@ bool Tokenizador::Tokenizar(const std::string &i) const
 }
 
 bool Tokenizador::TokenizarListaFicheros(const std::string &i) const{
+    // std::ifstream i_file;
+    // std::string cadena;
+
+    // i_file.open(i.c_str(), std::ios::binary);
+
+    // std::string content( (std::istreambuf_iterator<char>(i_file) ),
+    //                    (std::istreambuf_iterator<char>()       ) );
+
+
+    // if (!i_file){
+    //     std::cerr << "ERROR: No existe el archivo: " << i << std::endl;
+    //     return false;
+    // }
+    // else{
+    //     std::stringstream contentSteam (content);
+    //     while(getline(contentSteam, cadena,'\n')){
+    //         if(cadena.length() != 0){
+    //             if(!Tokenizar(cadena)){ cadena = false; }
+    //         }
+    //     }
+    // }
+
+    // i_file.close();
+    // return true;
+
     std::ifstream i_file;
     std::string cadena;
 
-    i_file.open(i.c_str());
+    i_file.open(i.c_str(), std::ios::binary);
 
     if (!i_file){
         std::cerr << "ERROR: No existe el archivo: " << i << std::endl;
         return false;
     }
     else{
-        while(!i_file.eof()){
-            cadena = "";
-            getline(i_file, cadena);
+        std::stringstream strStream;
+        strStream << i_file.rdbuf();
+        while(getline(strStream, cadena, '\n')){
             if(cadena.length() != 0){
                 if(!Tokenizar(cadena)){ cadena = false; }
             }
@@ -255,8 +308,7 @@ void Tokenizador::AnyadirDelimitadoresPalabra(const std::string &nuevoDelimiters
 
     for (size_t i = 0; i < n; i++)
     {
-        if (!Contiene(delimiters, nuevoDelimiters[i]))
-        {
+        if (delimiters.find_first_of(nuevoDelimiters[i],0) == std::string::npos){
             this->delimiters += nuevoDelimiters[i];
         }
     }
@@ -291,62 +343,58 @@ bool Tokenizador::PasarAminuscSinAcentos()
         FUNCIONES AUXILIARES CREADAS POR MI
     */
 
-bool Tokenizador::Contiene(const std::string &conjunto, const char &elemento)
-{
-    return (conjunto.find(elemento) != std::string::npos);
-}
-
 std::string Tokenizador::MinuscSinAcentos(const std::string &str) const
 {
     std::string minSin_str;
-    minSin_str = "";
+    minSin_str.resize(str.length());
+    //minSin_str = str;
 
-    for (size_t i = 0; i < str.length(); i++)
+    for (int i = str.length()-1; i >= 0 ; --i)
     {
         unsigned char aux = str[i];
         switch (aux)
         {
         case 209: // '?'
-            minSin_str += 'ñ';
+            minSin_str[i] = 'ñ';
             break;
 
         case 192: // '?'
         case 193: // '?'
         case 224: // '?'
         case 225: // '?'
-            minSin_str += 'a';
+            minSin_str[i] = 'a';
             break;
 
         case 200: // '?'
         case 201: // '?'
         case 232: // '?'
         case 233: // '?'
-            minSin_str += 'e';
+            minSin_str[i] = 'e';
             break;
 
         case 204: // '?'
         case 205: // '?'
         case 236: // '?'
         case 237: // '?'
-            minSin_str += 'i';
+            minSin_str[i] = 'i';
             break;
 
         case 210: // '?'
         case 211: // '?'
         case 242: // '?'
         case 243: // '?'
-            minSin_str += 'o';
+            minSin_str[i] = 'o';
             break;
 
         case 217: // '?'
         case 218: // '?'
         case 249: // '?'
         case 250: // '?'
-            minSin_str += 'u';
+            minSin_str[i] = 'u';
             break;
 
         default:
-            minSin_str += std::tolower(str[i]);
+            minSin_str[i] = std::tolower(str[i]);
             break;
         }
     }
@@ -359,8 +407,7 @@ std::string Tokenizador::Substraer(const std::string &str, const std::string &de
     std::string result;
     result = str;
 
-    for (size_t i = 0; i < delet.length(); i++)
-    {
+    for (size_t i = 0; i < delet.length(); i++){
         result.erase(remove(result.begin(), result.end(), delet[i]), result.end());
     }
 
@@ -400,7 +447,7 @@ bool Tokenizador::esURL(const std::string::size_type &lastPos, const std::string
 
 bool Tokenizador::esNumero(const std::string::size_type &lastPos, const std::string &str, const std::string &del, const std::string &delAux, std::string::size_type &pos) const
 {
-    if(str[pos] == '.' || str[pos] == ',' || str[lastPos-1] == '.' || str[lastPos-1] == '.' ){
+    if((str[pos] == '.' || str[pos] == ',' || str[lastPos-1] == '.' || str[lastPos-1] == '.')){
         std::string::size_type posAux;
         posAux = Encontrar_final(lastPos, str, del);
         if (posAux <= str.find_first_not_of("0123456789,.", lastPos)){

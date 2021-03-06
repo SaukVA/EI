@@ -143,9 +143,6 @@ class Tokenizador {
         // Si true pasará el token a minúsculas y quitará acentos, antes de realizar la tokenización
         bool pasarAminuscSinAcentos;
 
-        //Funcion para comprobar si existe el caracter dentro del string 
-        bool Contiene(const std::string& conjunto, const char& elemento);
-
         //Nos convierte un string a uno identico pero quita los acentos y las mayucaulas.
         std::string MinuscSinAcentos(const std::string& str) const;   
 
