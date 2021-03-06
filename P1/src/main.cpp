@@ -24,9 +24,9 @@ main() {
         // TODO EL CORPUS
         cout << "Ha tardado " << getcputime() - aa << " segundos" << endl;
 
-        // Tokenizador a("\t ,;:.-+/*_`'{}[]", true, true);
+        // Tokenizador a("@.,&", true, true);
         // list<string> token;
-        // a.Tokenizar("H”la MŸndo QuE·L ÏslA —Ò", token);
+        // a.Tokenizar(".34 ,56", token);
         // cout << "Numero de Tokens:\t" << token.size()<< endl;
         // for (auto const& i: token) {
         //         cout << "\t" << i << endl;

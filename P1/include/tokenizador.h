@@ -133,6 +133,9 @@ class Tokenizador {
         */
         std::string delimiters;
 
+        // Delimitadores auxiliares que sevan a usar para la practica;
+        std::string delimitersAux, delimitersURL, delimitersNum, delimitersMail, delimitersAcr, delimitersMul;
+
         /* 
             Si true detectará palabras compuestas y casos especiales. Sino,
             trabajará al igual que el algoritmo propuesto en la sección “Versión del
@@ -156,16 +159,16 @@ class Tokenizador {
         bool esURL(const std::string::size_type &lasPos, const std::string &str) const;
 
         //Comprueba si el token es un Numero
-        bool esNumero(const std::string::size_type &lasPos, const std::string &str, const std::string &del, const std::string &delAux, std::string::size_type &pos) const;
+        bool esNumero(const std::string::size_type &lasPos, const std::string &str, const std::string &del, std::string::size_type &pos) const;
 
         //Comprueba si el token es un Email 
         bool esEmail(const std::string::size_type &pos, const std::string::size_type &lasPos, const std::string &str, const std::string &del)const;
 
         //Comprueba si el token es un Acronimo
-        bool esAcronimo(const std::string::size_type &lastPos, const std::string &str, const std::string &del, const std::string &delAux, std::string::size_type &pos)const; 
+        bool esAcronimo(const std::string::size_type &lastPos, const std::string &str, const std::string &del, std::string::size_type &pos)const; 
 
         //Comprueba si el token es una Multipalabra
-        bool esMultPalab(const std::string::size_type &lastPos, const std::string &str, const std::string &del, const std::string &delAux, std::string::size_type &pos)const;
+        bool esMultPalab(const std::string::size_type &lastPos, const std::string &str, const std::string &del, std::string::size_type &pos)const;
 };
 
 #endif
