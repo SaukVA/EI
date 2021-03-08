@@ -1,5 +1,4 @@
 #include "tokenizador.h"
-#include <bits/stdc++.h>
 
 std::ostream &operator<<(std::ostream &os, const Tokenizador &tokenizador)
 {
@@ -34,13 +33,13 @@ Tokenizador::Tokenizador(const Tokenizador &tokenizador)
 
 Tokenizador::Tokenizador()
 {
-    this->delimiters = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
-    this->delimitersAux = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@ ";
-    this->delimitersURL = ",;+*\\ '\"{}[]()<>¡!¿\t\n\r ";
-    this->delimitersNum = ";:-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@ %$";
-    this->delimitersMail = ",;:/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r ";
-    this->delimitersAcr = ",;:-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@ ";
-    this->delimitersMul = ",;:./+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@ ";
+    this->delimiters = ",;:.-/+*\\ '\"{}[]()<>?!??&#=\t\n\r@";
+    this->delimitersAux = ",;:.-/+*\\ '\"{}[]()<>?!??&#=\t\n\r@ ";
+    this->delimitersURL = ",;+*\\ '\"{}[]()<>?!?\t\n\r ";
+    this->delimitersNum = ";:-/+*\\ '\"{}[]()<>?!??&#=\t\n\r@ %$";
+    this->delimitersMail = ",;:/+*\\ '\"{}[]()<>?!??&#=\t\n\r ";
+    this->delimitersAcr = ",;:-/+*\\ '\"{}[]()<>?!??&#=\t\n\r@ ";
+    this->delimitersMul = ",;:./+*\\ '\"{}[]()<>?!??&#=\t\n\r@ ";
     this->casosEspeciales = true;
     this->pasarAminuscSinAcentos = false;
 }
@@ -56,6 +55,12 @@ Tokenizador &Tokenizador::operator=(const Tokenizador &tokenizador)
     if (this != &tokenizador)
     {
         this->delimiters = tokenizador.delimiters;
+        this->delimitersAux = delimiters + " ";
+        this->delimitersURL = Substraer(delimitersAux, "_:/.?&-=#@");
+        this->delimitersNum = Substraer(delimitersAux, ",.%$") + "%$";
+        this->delimitersMail = Substraer(delimitersAux, "@.-_");
+        this->delimitersAcr = Substraer(delimitersAux, ".");
+        this->delimitersMul = Substraer(delimitersAux, "-");
         this->casosEspeciales = tokenizador.casosEspeciales;
         this->pasarAminuscSinAcentos = tokenizador.pasarAminuscSinAcentos;
     }
@@ -107,7 +112,7 @@ void Tokenizador::Tokenizar(const std::string &str, std::list<std::string> &toke
             }
 
             //Comprobamos si es una Numero
-            else if (esNumero(lastPos, copia_str, delimitersNum, pos))
+            else if (esNumero(lastPos, copia_str, pos))
             {
                 //std::cout << "Soy un Numero" << std::endl;
                 if (copia_str[lastPos - 1] == '.' || copia_str[lastPos - 1] == ',')
@@ -119,7 +124,7 @@ void Tokenizador::Tokenizar(const std::string &str, std::list<std::string> &toke
                     tokens.push_back(copia_str.substr(lastPos, pos - lastPos));
                 }
 
-                //Si se termina por '%' o '$' se añade eso como un token extra
+                //Si se termina por '%' o '$' se a?ade eso como un token extra
                 if (copia_str[pos] == '$' || copia_str[pos] == '%')
                 {
                     std::string temp;
@@ -130,7 +135,7 @@ void Tokenizador::Tokenizar(const std::string &str, std::list<std::string> &toke
             }
 
             //Comprobamos si es un Email
-            else if (esEmail(pos, lastPos, copia_str, delimitersMail))
+            else if (esEmail(lastPos, copia_str, pos))
             {
                 //std::cout << "Soy un Email" << std::endl;
                 pos = Encontrar_final(lastPos, copia_str, delimitersMail);
@@ -138,14 +143,14 @@ void Tokenizador::Tokenizar(const std::string &str, std::list<std::string> &toke
             }
 
             //Comprobamos si es un Acronimo
-            else if (esAcronimo(lastPos, copia_str, delimitersAcr, pos))
+            else if (esAcronimo(lastPos, copia_str, pos))
             {
                 //std::cout << "Soy un Acronimo" << std::endl;
                 tokens.push_back(copia_str.substr(lastPos, pos - lastPos));
             }
 
             //Comprobamos si es una Multipalabra
-            else if (esMultPalab(lastPos, copia_str, delimitersMul, pos))
+            else if (esMultPalab(lastPos, copia_str, pos))
             {
                 //std::cout << "Soy una Multipalabra" << std::endl;
                 tokens.push_back(copia_str.substr(lastPos, pos - lastPos));
@@ -339,7 +344,7 @@ std::string Tokenizador::MinuscSinAcentos(const std::string &str) const
         switch (aux)
         {
         case 209: // '?'
-            minSin_str[i] = 'ñ';
+            minSin_str[i] = '?';
             break;
 
         case 192: // '?'
@@ -424,17 +429,20 @@ std::string::size_type Tokenizador::Encontrar_final(const std::string::size_type
 bool Tokenizador::esURL(const std::string::size_type &lastPos, const std::string &str) const
 {
     return (
-        str.substr(lastPos, lastPos+5) == "http:"  && str.length() > 5 ||
-        str.substr(lastPos, lastPos+6) == "https:" && str.length() > 6 ||
-        str.substr(lastPos, lastPos+4) == "ftp:"   && str.length() > 4);
+        str.substr(lastPos, lastPos+5).find("http:") == 0  && str.length() > 5 ||   //Comprobamos si empriza por http: y tiene algo a continuación
+        str.substr(lastPos, lastPos+6).find("https:") == 0 && str.length() > 6 ||   //Comprobamos si empriza por https: y tiene algo a continuación
+        str.substr(lastPos, lastPos+4).find("ftp:") == 0   && str.length() > 4);    //Comprobamos si empriza por ftp: y tiene algo a continuación
 }
 
-bool Tokenizador::esNumero(const std::string::size_type &lastPos, const std::string &str, const std::string &del, std::string::size_type &pos) const
+bool Tokenizador::esNumero(const std::string::size_type &lastPos, const std::string &str, std::string::size_type &pos) const
 {
-    if((str[pos] == '.' || str[pos] == ',' || str[lastPos-1] == ',' || str[lastPos-1] == '.')){
+    if( 
+        str[pos] == '.' || str[pos] == ',' ||           // Comprobamos que contenga una coma o un punto
+        str[lastPos-1] == ',' || str[lastPos-1] == '.'  // o que empiece por coma o punto 
+    ){
         std::string::size_type posAux;
-        posAux = Encontrar_final(lastPos, str, del);
-        if (posAux <= str.find_first_not_of("0123456789,.", lastPos)){
+        posAux = Encontrar_final(lastPos, str, delimitersNum);
+        if (posAux <= str.find_first_not_of("0123456789,.", lastPos)){  // Comprobamos que esta formado solo por numeros putos y comas
             pos = posAux;
             return true;
         }
@@ -442,13 +450,13 @@ bool Tokenizador::esNumero(const std::string::size_type &lastPos, const std::str
     return false;
 }
 
-bool Tokenizador::esEmail(const std::string::size_type &pos, const std::string::size_type &lasPos, const std::string &str, const std::string &del) const
+bool Tokenizador::esEmail(const std::string::size_type &lasPos, const std::string &str, const std::string::size_type &pos) const
 {
 
     std::string::size_type posAux, posAux2, posAux3;
     posAux = str.find_first_of("@", pos + 1);
     posAux2 = str.find_first_of(" ", pos + 1);
-    posAux3 = str.find_first_of(del + ".-_", pos + 1);
+    posAux3 = str.find_first_of(delimitersMail + ".-_", pos + 1);
 
     return (
         str[pos] == '@' &&                                   //Comprobamos que el delimitador que se ha encontrado es un '@'
@@ -457,13 +465,16 @@ bool Tokenizador::esEmail(const std::string::size_type &pos, const std::string::
     );
 }
 
-bool Tokenizador::esAcronimo(const std::string::size_type &lastPos, const std::string &str, const std::string &del, std::string::size_type &pos) const
+bool Tokenizador::esAcronimo(const std::string::size_type &lastPos, const std::string &str, std::string::size_type &pos) const
 {
 
     if(str[pos] == '.'){
         std::string::size_type posAux;
-        posAux = Encontrar_final(lastPos, str, del);
-        if (delimiters.find_first_of(".", 0) != std::string::npos && posAux > str.find_first_of(".", lastPos)){
+        posAux = Encontrar_final(lastPos, str, delimitersAcr);
+        if (
+            delimiters.find_first_of(".", 0) != std::string::npos &&    // Comprobamos que se este utilizando el '.' como delimitador
+            posAux > str.find_first_of(".", lastPos)                    // y que haya algo detras del punto                     
+        ){
             pos = posAux;
             return true;
         }
@@ -471,12 +482,15 @@ bool Tokenizador::esAcronimo(const std::string::size_type &lastPos, const std::s
     return false;
 }
 
-bool Tokenizador::esMultPalab(const std::string::size_type &lastPos, const std::string &str, const std::string &del, std::string::size_type &pos) const
+bool Tokenizador::esMultPalab(const std::string::size_type &lastPos, const std::string &str, std::string::size_type &pos) const
 {
     if(str[pos] == '-'){
         std::string::size_type posAux;
-        posAux = Encontrar_final(lastPos, str, del);
-        if(delimiters.find_first_of("-", 0) != std::string::npos && posAux > str.find_first_of("-", lastPos)){
+        posAux = Encontrar_final(lastPos, str, delimitersMul);
+        if(
+            delimiters.find_first_of("-", 0) != std::string::npos &&    // Comprobamos que se este utilizando el '-'
+            posAux > str.find_first_of("-", lastPos)                    // y que haya algo despues del guion
+        ){
             pos = posAux;
             return true;
         }

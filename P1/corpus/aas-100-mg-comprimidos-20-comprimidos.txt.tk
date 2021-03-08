@@ -26,15 +26,7 @@ dos
 ·
 url
 e-mails
-http
-intime.dlsi.ua.es
-8080
-dossierct
-index.jsp
-lang=es
-status=probable
-date=22-01-2013
-newspaper=
+http://intime.dlsi.ua.es:8080/dossierct/index.jsp?lang=es&status=probable&date=22-01-2013&newspaper=
 catedratelefonicaua@iuii.ua.es
 ·
 deteccion

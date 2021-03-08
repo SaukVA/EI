@@ -3676,8 +3676,7 @@ europea
 del
 medicamento
 emea
-http
-www.emea.europa.eu
+http://www.emea.europa.eu/.
 a
 titular
 de
@@ -4484,7 +4483,8 @@ que
 debe
 incluirse
 en
-pequeños
+peque
+os
 acondicionamientos
 primarios
 jeringa
@@ -4539,7 +4539,8 @@ que
 debe
 incluirse
 en
-pequeños
+peque
+os
 acondicionamientos
 primarios
 bolsa
@@ -6773,8 +6774,7 @@ europea
 del
 medicamento
 emea
-http
-www.emea.europa.eu
+http://www.emea.europa.eu/.
 prospectos
 de
 medicamentos

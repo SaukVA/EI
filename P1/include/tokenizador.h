@@ -3,11 +3,15 @@
 
 
 #include <iostream>
+#include <sstream> 
+#include <string>
+#include <fstream>
 #include <string>
 #include <list>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <cstdlib>
+#include <bits/stdc++.h> //Preguntar sobre esta libreria
 
 class Tokenizador {
     /* 
@@ -159,16 +163,16 @@ class Tokenizador {
         bool esURL(const std::string::size_type &lasPos, const std::string &str) const;
 
         //Comprueba si el token es un Numero
-        bool esNumero(const std::string::size_type &lasPos, const std::string &str, const std::string &del, std::string::size_type &pos) const;
+        bool esNumero(const std::string::size_type &lasPos, const std::string &str, std::string::size_type &pos) const;
 
         //Comprueba si el token es un Email 
-        bool esEmail(const std::string::size_type &pos, const std::string::size_type &lasPos, const std::string &str, const std::string &del)const;
+        bool esEmail(const std::string::size_type &lasPos, const std::string &str, const std::string::size_type &pos)const;
 
         //Comprueba si el token es un Acronimo
-        bool esAcronimo(const std::string::size_type &lastPos, const std::string &str, const std::string &del, std::string::size_type &pos)const; 
+        bool esAcronimo(const std::string::size_type &lastPos, const std::string &str, std::string::size_type &pos)const; 
 
         //Comprueba si el token es una Multipalabra
-        bool esMultPalab(const std::string::size_type &lastPos, const std::string &str, const std::string &del, std::string::size_type &pos)const;
+        bool esMultPalab(const std::string::size_type &lastPos, const std::string &str, std::string::size_type &pos)const;
 };
 
 #endif
