@@ -344,7 +344,7 @@ std::string Tokenizador::MinuscSinAcentos(const std::string &str) const
         switch (aux)
         {
         case 209: // '?'
-            minSin_str[i] = '?';
+            minSin_str[i] = 'ñ';
             break;
 
         case 192: // '?'
