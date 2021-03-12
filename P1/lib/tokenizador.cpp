@@ -204,32 +204,6 @@ bool Tokenizador::Tokenizar(const std::string &i, const std::string &f) const
     i_file.close();
     f_file.close();
 
-    // bool resul = false;
-    // std::list<std::string> tokens;
-    // std::string str, temp;
-    // std::ofstream ffs(f.c_str(), std::ios::binary);
-    // std::ifstream ifs(i.c_str(), std::ios::binary);
-    // std::string content( (std::istreambuf_iterator<char>(ifs) ),
-    //                      (std::istreambuf_iterator<char>()    ) );
-
-    // if (!ifs)
-    // {
-    //     std::cerr << "ERROR: No existe el archivo: " << i << std::endl;
-    // }
-
-    // else{
-    //     std::stringstream contSt (content);
-    //     while(getline(contSt, str, '\n'))
-    //     {
-    //         Tokenizar(str, tokens);
-    //         for (std::string const &token : tokens){ 
-    //             temp += token + "\n";
-    //         }
-    //     }
-    //         ffs << temp;
-    //         resul = true;
-    // }
-
     return resul;
 }
 
