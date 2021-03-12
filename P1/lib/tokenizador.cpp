@@ -216,6 +216,8 @@ bool Tokenizador::TokenizarListaFicheros(const std::string &i) const{
 
     std::ifstream i_file;
     std::string cadena;
+    bool resul;
+    resul = true;
 
     i_file.open(i.c_str(), std::ios::binary);
 
@@ -228,13 +230,13 @@ bool Tokenizador::TokenizarListaFicheros(const std::string &i) const{
         strStream << i_file.rdbuf();
         while(getline(strStream, cadena, '\n')){
             if(cadena.length() != 0){
-                if(!Tokenizar(cadena)){ cadena = false; }
+                if(!Tokenizar(cadena)){ resul = false; }
             }
         }
     }
 
     i_file.close();
-    return true;
+    return resul;
 }
 
 bool Tokenizador::TokenizarDirectorio (const std::string& i) const{
