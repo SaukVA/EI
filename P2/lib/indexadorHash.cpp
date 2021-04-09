@@ -12,7 +12,23 @@ ostream& operator<<(ostream& s, const IndexadorHash& p) {
 }
 
 IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimitadores, const bool& detectComp, const bool& minuscSinAcentos, const string& dirIndice, const int& tStemmer, const bool& almEnDisco, const bool& almPosTerm){
-    //...
+
+    // ifstream file;
+    // string str;
+
+    // file.open(fichStopWords.c_str(),ios::binary);
+
+    // if(file){
+    //     this->ficheroStopWords = fichStopWords;
+    //     std::stringstream strStream;
+    //     strStream << file.rdbuf();
+    //     while (getline(strStream, str, '\n')){
+
+    //     }
+    // }
+
+    // file.close();
+    
 }
 
 IndexadorHash::IndexadorHash(const string& directorioIndexacion){
