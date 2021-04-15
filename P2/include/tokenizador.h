@@ -115,7 +115,7 @@ class Tokenizador {
         void CasosEspeciales (const bool& nuevoCasosEspeciales);
 
         // Devuelve el contenido de la variable privada “casosEspeciales”
-        bool CasosEspeciales ();
+        bool CasosEspeciales () const;
         
         /* 
             Cambia la variable privada “pasarAminuscSinAcentos”. Atención al
@@ -125,7 +125,7 @@ class Tokenizador {
         void PasarAminuscSinAcentos (const bool& nuevoPasarAminuscSinAcentos);
 
         // Devuelve el contenido de la variable privada “pasarAminuscSinAcentos”
-        bool PasarAminuscSinAcentos ();
+        bool PasarAminuscSinAcentos () const;
 
     private:
 

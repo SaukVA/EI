@@ -21,7 +21,7 @@ IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimita
 
     // if(file){
     //     this->ficheroStopWords = fichStopWords;
-    //     std::stringstream strStream;
+    //     stringstream strStream;
     //     strStream << file.rdbuf();
     //     while (getline(strStream, str, '\n')){
 
@@ -82,6 +82,7 @@ IndexadorHash& IndexadorHash::operator= (const IndexadorHash& index){
         stopWords = index.stopWords;
         tok = index.tok;
     }
+    return *this;
 }
 
 bool IndexadorHash::Indexar(const string& ficheroDocumentos){
@@ -90,8 +91,17 @@ bool IndexadorHash::Indexar(const string& ficheroDocumentos){
 }
 
 bool IndexadorHash::IndexarDirectorio(const string& dirAIndexar){
-    //...
-    return false;
+    struct stat dir;
+    // Compruebo la existencia del directorio
+    int err = stat(dirAIndexar.c_str(), &dir);
+    if(err==-1 || !S_ISDIR(dir.st_mode))
+        return false;
+    else {
+        // Hago una lista en un fichero con find>fich
+        std::string cmd="find "+ dirAIndexar +" -follow |sort > .lista_fich";
+        system(cmd.c_str());
+        return Indexar(".lista_fich");
+    }
 }
 
 bool IndexadorHash::GuardarIndexacion() const{
@@ -100,8 +110,8 @@ bool IndexadorHash::GuardarIndexacion() const{
 }
 
 bool IndexadorHash::RecuperarIndexacion (const string& directorioIndexacion){
-    //...
-    return false;
+    (*this) = IndexadorHash(directorioIndice);
+    return true;
 }
 
 void IndexadorHash::ImprimirIndexacion() const{
@@ -117,8 +127,37 @@ void IndexadorHash::ImprimirIndexacion() const{
 }
 
 bool IndexadorHash::IndexarPregunta(const string& preg){
-    //...
-    return false;
+
+    list<string> tokens;    // Definimos los elementos que vamos a usar
+    int pal, palParada;           
+    pal = 0;                 // Inicimos los elementos a usar
+    palParada = 0;
+
+
+    indicePregunta.clear();             // Vaciamos el contenido de indicePregunta
+    infPregunta.~InformacionPregunta(); // Vaciamos el contenido de infPregunta
+    pregunta = preg;                    // Guardamos la pregunta
+
+    tok.Tokenizar(preg, tokens);        // Tokenizamos la pregunta 
+
+    for(string const &token : tokens){
+        if(stopWords.find(token) != stopWords.end()){                   //Si el token es una palabra de parada
+            ++palParada;
+        }
+        else{                                                           // Si el token no es una palabra de parada 
+            if(indicePregunta.find(token) != indicePregunta.end()){     // Registramos el token si es nuevo 
+                //...
+            }
+            //...
+        }
+        ++pal;
+    }
+
+    infPregunta.set_numTotalPal(pal);
+    infPregunta.set_numTotalPalSinParada(pal - palParada); 
+    //infPregunta.set_numTotalPalDiferentes(pal);
+
+    return true;
 }
 
 bool IndexadorHash::DevuelvePregunta(string& preg) const{
@@ -140,7 +179,10 @@ bool IndexadorHash::DevuelvePregunta(const string& word, InformacionTerminoPregu
 }
 
 bool IndexadorHash::DevuelvePregunta(InformacionPregunta& inf) const{
-    //...
+    if(!pregunta.empty()){
+        inf = infPregunta;
+        return true;
+    }
     return false;
 }
 
@@ -167,7 +209,11 @@ bool IndexadorHash::Devuelve(const string& word, InformacionTermino& inf) const{
 }
 
 bool IndexadorHash::Devuelve(const string& word, const string& nomDoc, InfTermDoc& InfDoc)const{
-    //...
+    if(Existe(word) && indiceDocs.find(nomDoc) != indiceDocs.end()){
+        long int idDoc = indiceDocs.find(nomDoc)->second.Get_IdDoc();   // Obtenemos el id del documendo;
+        InfDoc = indice.find(word)->second.Devolver_Info(idDoc);        // Buscamos la Informacion del termino
+        if(InfDoc.get_ft() > 0){ return true; }                         // Si aparece una vez o mas devolvemos true
+    }
     return false;
 }
 
@@ -180,7 +226,24 @@ bool IndexadorHash::Borra(const string& word){
 }
 
 bool IndexadorHash::BorraDoc(const string& nomDoc){
-    //...
+    if(indiceDocs.find(nomDoc) != indiceDocs.end()){
+        long int idDoc = indiceDocs.find(nomDoc)->second.Get_IdDoc();                       // Sacamos el id del documento
+        InfDoc docInfo = indiceDocs.find(nomDoc)->second;                                   // Sacamos los datos del doumento 
+
+        for(auto it = indice.begin(); it != indice.end(); ++it){                            // Recorremos cada uno de los terminos
+            if(it->second.ApareceEnDoc(idDoc)){                                             // Si el termino aparece en el documento
+                int newFtc;
+                newFtc = it->second.get_ftc() - it->second.Devolver_Info(idDoc).get_ft();   // Calculamos el nuevo ftc del termino
+                it->second.set_ftc(newFtc);                                                 // Lo asignamos 
+                if(newFtc == 0){                                                            //??? Se deberia de borrar el termino si se queda sin ninguna referencia?
+                    Borra(it->first);
+                }
+            }
+        }
+
+        informacionColeccionDocs.EliminarInfDoc(docInfo);                                   // Eliminamos los datos del documento del registro
+        return (indiceDocs.erase(nomDoc) != 0);                                             // Eliminamos el documento
+    }
     return false;
 }
 
@@ -267,13 +330,17 @@ void IndexadorHash::ListarTerminos() const{
 }
 
 bool IndexadorHash::ListarTerminos(const string& nomDoc) const{
-    if(indiceDocs.find(nomDoc) == indiceDocs.end()){
-        return false;
-    }
-    else{
-        //...
+    
+    if(indiceDocs.find(nomDoc) != indiceDocs.end()){
+        long int idDoc = indiceDocs.find(nomDoc)->second.Get_IdDoc();
+        for(auto it = indice.begin(); it != indice.end(); ++it){
+            if(it->second.ApareceEnDoc(idDoc)){
+                cout << it->first << "\t" << it->second << endl;        //??? preguntar si es asi o tengo que poner otra cosa como termino
+            }
+        }
         return true;
     }
+    return false;
 }
 
 void IndexadorHash::ListarDocs() const{
@@ -283,13 +350,11 @@ void IndexadorHash::ListarDocs() const{
 }
 
 bool IndexadorHash::ListarDocs(const string& nomDoc) const{
-    if(indiceDocs.find(nomDoc) == indiceDocs.end()){
-        return false;
-    }
-    else{
+    if(indiceDocs.find(nomDoc) != indiceDocs.end()){
         cout << indiceDocs.find(nomDoc)->first << "\t" << indiceDocs.find(nomDoc)->second << endl;
         return true;
     }
+    return false;
 }
 
 IndexadorHash::IndexadorHash(){

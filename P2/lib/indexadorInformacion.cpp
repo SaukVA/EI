@@ -39,6 +39,8 @@ InfTermDoc & InfTermDoc::operator= (const InfTermDoc &inf){
     return (*this);
 }
 
+int InfTermDoc::get_ft()const { return ft; }
+
 
 /************************************************************/
 /*															*/
@@ -75,7 +77,23 @@ InformacionTermino & InformacionTermino::operator= (const InformacionTermino &in
         ftc = info.ftc;
         l_docs = info.l_docs;
     }
+    return *this;
 }
+
+InfTermDoc InformacionTermino::Devolver_Info(const long int &idDoc)const{
+    InfTermDoc resul;
+
+    if(ApareceEnDoc(idDoc)){
+        resul = l_docs.find(idDoc)->second;
+    }
+    return resul;
+}
+
+bool InformacionTermino::ApareceEnDoc(const long int & idDoc)const{ return !(l_docs.find(idDoc) == l_docs.end()); }
+
+void InformacionTermino::set_ftc(const int &ftc){ this->ftc = ftc; }
+
+int InformacionTermino::get_ftc(){ return ftc; }
 
 
 /************************************************************/
@@ -130,7 +148,29 @@ InfDoc & InfDoc::operator= (const InfDoc &info){
         numPalDiferentes = info.numPalDiferentes;
         numPalSinParada = info.numPalSinParada;
     }
+    return *this;
 }
+
+long int InfDoc::Get_IdDoc()const{
+    return idDoc;
+}
+
+int InfDoc::Get_numPal()const{
+    return numPal;
+}
+
+int InfDoc::Get_numPalSinParada()const{
+    return numPalSinParada;
+}
+
+int InfDoc::Get_numPalDiferentes()const{
+    return numPalDiferentes;
+}
+
+int InfDoc::Get_tamBytes()const{
+    return tamBytes;
+}
+
 
 
 /************************************************************/
@@ -181,6 +221,15 @@ InfColeccionDocs & InfColeccionDocs::operator= (const InfColeccionDocs &info){
         numTotalPalDiferentes = info. numTotalPalDiferentes;
         tamBytes = info.tamBytes;
     }
+    return *this;
+}
+
+void InfColeccionDocs::EliminarInfDoc(const InfDoc &doc){
+    --numDocs;
+    numTotalPal           -= doc.Get_numPal();
+    numTotalPalSinParada  -= doc.Get_numPalSinParada();
+    numTotalPalDiferentes -= doc.Get_numPalDiferentes();
+    tamBytes              -= doc.Get_tamBytes();
 }
 
 
@@ -219,6 +268,7 @@ InformacionTerminoPregunta & InformacionTerminoPregunta::operator= (const Inform
         ft = info.ft;
         posTerm = info.posTerm;
     }
+    return *this;
 }
 
 
@@ -260,4 +310,18 @@ InformacionPregunta & InformacionPregunta::operator= (const InformacionPregunta&
         numTotalPalSinParada = info.numTotalPalSinParada;
         numTotalPalDiferentes = info.numTotalPalDiferentes;
     }
+    return *this;
+}
+
+
+void InformacionPregunta::set_numTotalPal(const int &pal){
+    numTotalPal = pal;
+}
+
+void InformacionPregunta::set_numTotalPalSinParada(const int &palSin){
+    numTotalPalSinParada = palSin;
+}
+
+void InformacionPregunta::set_numTotalPalDiferentes(const int &palDif){
+    numTotalPalDiferentes = palDif;
 }

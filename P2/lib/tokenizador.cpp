@@ -289,7 +289,7 @@ void Tokenizador::CasosEspeciales(const bool &nuevoCasosEspeciales)
     this->casosEspeciales = nuevoCasosEspeciales;
 }
 
-bool Tokenizador::CasosEspeciales()
+bool Tokenizador::CasosEspeciales() const
 {
     return this->casosEspeciales;
 }
@@ -299,7 +299,7 @@ void Tokenizador::PasarAminuscSinAcentos(const bool &nuevoPasarAminuscSinAcentos
     this->pasarAminuscSinAcentos = nuevoPasarAminuscSinAcentos;
 }
 
-bool Tokenizador::PasarAminuscSinAcentos()
+bool Tokenizador::PasarAminuscSinAcentos() const
 {
     return this->pasarAminuscSinAcentos;
 }
@@ -405,9 +405,9 @@ std::string::size_type Tokenizador::Encontrar_final(const std::string::size_type
 bool Tokenizador::esURL(const std::string::size_type &lastPos, const std::string &str) const
 {
     return (
-        str.substr(lastPos, lastPos+5).find("http:") == 0  && str.length() > 5 ||   //Comprobamos si empriza por http: y tiene algo a continuación
-        str.substr(lastPos, lastPos+6).find("https:") == 0 && str.length() > 6 ||   //Comprobamos si empriza por https: y tiene algo a continuación
-        str.substr(lastPos, lastPos+4).find("ftp:") == 0   && str.length() > 4);    //Comprobamos si empriza por ftp: y tiene algo a continuación
+        str.substr(lastPos, lastPos+5).find("http:") == 0  && str.length() > 5 ||   //Comprobamos si empriza por http: y tiene algo a continuaciï¿½n
+        str.substr(lastPos, lastPos+6).find("https:") == 0 && str.length() > 6 ||   //Comprobamos si empriza por https: y tiene algo a continuaciï¿½n
+        str.substr(lastPos, lastPos+4).find("ftp:") == 0   && str.length() > 4);    //Comprobamos si empriza por ftp: y tiene algo a continuaciï¿½n
 }
 
 bool Tokenizador::esNumero(const std::string::size_type &lastPos, const std::string &str, std::string::size_type &pos) const

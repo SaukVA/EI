@@ -45,7 +45,8 @@ class InfTermDoc {
         InfTermDoc ();                                  // Inicializa ft = 0
         ~InfTermDoc ();                                 // Pone ft = 0
         InfTermDoc & operator= (const InfTermDoc &);    // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
-    
+        int get_ft ()const;                             // Nos devuelve ft
+
     private:
         int ft; // Frecuencia del término en el documento
         list<int> posTerm; 
@@ -60,10 +61,14 @@ class InformacionTermino {
         friend ostream& operator<<(ostream& s, const InformacionTermino& p);
     public:
         InformacionTermino (const InformacionTermino &);
-        InformacionTermino ();                                          // Inicializa ftc = 0
-        ~InformacionTermino ();                                         // Pone ftc = 0 y vacía l_docs
-        InformacionTermino & operator= (const InformacionTermino &);    // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
-    
+        InformacionTermino ();                                              // Inicializa ftc = 0
+        ~InformacionTermino ();                                             // Pone ftc = 0 y vacía l_docs
+        InformacionTermino & operator= (const InformacionTermino &);        // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
+        InfTermDoc Devolver_Info(const long int &idDoc) const;              // Dado el id de un documento devuelve la informacion del termino en el documento o vacio
+        bool ApareceEnDoc(const long int &idDoc)const;                      // Nos dice si el termino aparece del documento especificado
+        void set_ftc(const int & ftc);
+        int get_ftc();
+
     private:
         int ftc; // Frecuencia total del término en la colección
         unordered_map<long int, InfTermDoc> l_docs;
@@ -79,7 +84,12 @@ class InfDoc {
         InfDoc ();
         ~InfDoc ();
         InfDoc & operator= (const InfDoc &); // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
-    
+        long int Get_IdDoc()const;
+        int Get_numPal()const;
+        int Get_numPalSinParada()const;
+        int Get_numPalDiferentes()const;
+        int Get_tamBytes()const;
+
     private:
         long int idDoc;          // Identificador del documento. El primer documento indexado en la colección será el identificador 1
         int numPal;              // Nº total de palabras del documento
@@ -96,6 +106,7 @@ class InfColeccionDocs {
         InfColeccionDocs ();
         ~InfColeccionDocs ();
         InfColeccionDocs & operator= (const InfColeccionDocs &);
+        void EliminarInfDoc(const InfDoc &doc);
     
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
     private:
@@ -131,12 +142,15 @@ class InformacionPregunta {
         InformacionPregunta ();
         ~InformacionPregunta ();
         InformacionPregunta & operator= (const InformacionPregunta &);
+        void set_numTotalPal(const int &pal);
+        void set_numTotalPalSinParada(const int &palSin);
+        void set_numTotalPalDiferentes(const int &palDif);
     
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
     private:
-        long int numTotalPal;           // No total de palabras en la pregunta
-        long int numTotalPalSinParada;  // No total de palabras sin stop-words en la pregunta
-        long int numTotalPalDiferentes; // No total de palabras diferentes en la pregunta que no sean stop-words (sin acumular la frecuencia de cada una de ellas)
+        long int numTotalPal;           // Nº total de palabras en la pregunta
+        long int numTotalPalSinParada;  // Nº total de palabras sin stop-words en la pregunta
+        long int numTotalPalDiferentes; // Nº total de palabras diferentes en la pregunta que no sean stop-words (sin acumular la frecuencia de cada una de ellas)
 };
 
 #endif

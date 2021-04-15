@@ -15,25 +15,25 @@ class IndexadorHash {
         // almacenará en el campo privado “ficheroStopWords”. Asimismo, almacenará
         // todas las palabras de parada que contenga el archivo en el campo privado
         // “stopWords”, el índice de palabras de parada.
-
+        //
         // “delimitadores” será el string que contiene todos los delimitadores
         // utilizados por el tokenizador (campo privado “tok”)
-
+        //
         // detectComp y minuscSinAcentos serán los parámetros que se pasarán al tokenizador
-        
+        //
         // “dirIndice” será el directorio del disco duro donde se almacenará el
         // índice (campo privado “directorioIndice”). Si dirIndice=”” entonces se
         // almacenará en el directorio donde se ejecute el programa
-
+        //
         // “tStemmer” inicializará la variable privada “tipoStemmer”:
-            // 0 = no se aplica stemmer: se indexa el término tal y como aparece tokenizado
-            // 1 = stemmer de Porter para español
-            // 2 = stemmer de Porter para inglés
-
+        //      0 = no se aplica stemmer: se indexa el término tal y como aparece tokenizado
+        //      1 = stemmer de Porter para español
+        //      2 = stemmer de Porter para inglés
+        //
         // “almEnDisco” inicializará la variable privada “almacenarEnDisco”
-
+        //
         // “almPosTerm” inicializará la variable privada “almacenarPosTerm”
-
+        //
         // Los índices (p.ej. índice, indiceDocs e informacionColeccionDocs) quedarán vacíos
         IndexadorHash(const string& fichStopWords, const string& delimitadores, const bool& detectComp, const bool& minuscSinAcentos, const string& dirIndice, const int& tStemmer, const bool& almEnDisco, const bool& almPosTerm);
 
@@ -56,12 +56,12 @@ class IndexadorHash {
         // documentos detallada en ficheroDocumentos, el cual contendrá un nombre
         // de documento por línea. Los añadirá a los ya existentes anteriormente en
         // el índice.
-
+        //
         // Devuelve falso si no finaliza la indexación (p.ej. por falta de
         // memoria), mostrando el mensaje de error correspondiente, indicando el
         // documento y término en el que se ha quedado, dejando en memoria lo que
         // se haya indexado hasta ese momento.
-
+        //
         // En el caso que aparezcan documentos repetidos, documentos que no
         // existen o que ya estuviesen previamente indexados (ha de coincidir el
         // nombre del documento y el directorio en que se encuentre), se devolverá
@@ -78,12 +78,12 @@ class IndexadorHash {
         // mismos). Se considerará que todos los documentos del directorio serán
         // ficheros de texto. Los añadirá a los ya existentes anteriormente en el
         // índice.
-
+        //
         // Devuelve falso si no finaliza la indexación (p.ej. por falta de
         // memoria o porque no exista “dirAIndexar”), mostrando el mensaje de error
         // correspondiente, indicando el documento y término en el que se ha
         // quedado, dejando en memoria lo que se haya indexado hasta ese momento.
-
+        //
         // En el caso que aparezcan documentos repetidos o que ya estuviesen
         // previamente indexados (ha de coincidir el nombre del documento y el
         // directorio en que se encuentre), se mostrará el mensaje de excepción
@@ -106,12 +106,12 @@ class IndexadorHash {
         // entonces mediante el comando: “IndexadorHash b(“./dirIndexPrueba”);” se
         // recuperará la indexación realizada en la secuencia anterior, cargándola
         // en “b”
-
+        //
         // Devuelve falso si no finaliza la operación (p.ej. por falta de
         // memoria, o el nombre del directorio contenido en “directorioIndice” no
         // es correcto), mostrando el mensaje de error correspondiente, vaciando
         // los ficheros generados.
-
+        //
         // En caso que no existiese el directorio directorioIndice, habría que
         // crearlo previamente 
         bool GuardarIndexacion() const;
@@ -130,11 +130,11 @@ class IndexadorHash {
 
         // Devuelve true si consigue crear el índice para la pregunta “preg”.
         // Antes de realizar la indexación vaciará los campos privados indicePregunta e infPregunta
-
+        //
         // Generará la misma información que en la indexación de documentos,
         // pero dejándola toda accesible en memoria principal (mediante las
         // variables privadas “pregunta, indicePregunta, infPregunta”)
-
+        //
         // Devuelve falso si no finaliza la operación (p.ej. por falta de
         // memoria o bien si la pregunta no contiene ningún término con contenido),
         // mostrando el mensaje de error correspondiente
@@ -314,10 +314,10 @@ class IndexadorHash {
         // 0 = no se aplica stemmer: se indexa el término tal y como aparece tokenizado
         // Los siguientes valores harán que los términos a indexar se les
         // aplique el stemmer y se almacene solo dicho stem.
-            // 1 = stemmer de Porter para español
-            // 2 = stemmer de Porter para inglés
-                // Para el stemmer de Porter se utilizarán los archivos
-                // stemmer.cpp y stemmer.h, concretamente las funciones de nombre “stemmer”
+        //      1 = stemmer de Porter para español
+        //      2 = stemmer de Porter para inglés
+        //          Para el stemmer de Porter se utilizarán los archivos
+        //          stemmer.cpp y stemmer.h, concretamente las funciones de nombre “stemmer”
         int tipoStemmer;
 
         // Esta opción (cuando almacenarEnDisco == true) está ideada para poder
