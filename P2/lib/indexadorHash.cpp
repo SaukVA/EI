@@ -13,22 +13,36 @@ ostream& operator<<(ostream& s, const IndexadorHash& p) {
 }
 
 IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimitadores, const bool& detectComp, const bool& minuscSinAcentos, const string& dirIndice, const int& tStemmer, const bool& almEnDisco, const bool& almPosTerm){
-    //...
-    // ifstream file;
-    // string str;
 
-    // file.open(fichStopWords.c_str(),ios::binary);
+    ifstream file;   //Declaramos los elementros que vamos a usar 
+    string str;
 
-    // if(file){
-    //     this->ficheroStopWords = fichStopWords;
-    //     stringstream strStream;
-    //     strStream << file.rdbuf();
-    //     while (getline(strStream, str, '\n')){
+    file.open(fichStopWords.c_str(),ios::binary);   // Intentamos abrir el ficheroStopWords de forma binaria
 
-    //     }
-    // }
+    if(file){
+        this->ficheroStopWords = fichStopWords;     // Asignamos el nombre del fichero a la bariable
+        stringstream strStream;                     // Creamos un stringstream para almacenar el fichero
+        strStream << file.rdbuf();                  // Volcamos el fichore en la variable
+        while (getline(strStream, str, '\n')){      // Recorremos por lineal el fichero
+            if(str.length() != 0){
+                stopWords.insert(str);              //??? Con esto sobra?
+            }
+        }
+    }
 
-    // file.close();
+    file.close();                                   // Cerramos el fichero
+
+    directorioIndice = dirIndice;                   // Guardamos el resto de datos
+    if(dirIndice == ""){directorioIndice = "./";}
+    indice.clear();
+    indiceDocs.clear();
+    indicePregunta.clear();
+    tipoStemmer = tStemmer;
+    almacenarEnDisco = almEnDisco;
+    almacenarPosTerm = almPosTerm;
+    tok.CasosEspeciales(detectComp);
+    tok.DelimitadoresPalabra(delimitadores);
+    tok.PasarAminuscSinAcentos(minuscSinAcentos);   
     
 }
 
@@ -130,7 +144,7 @@ bool IndexadorHash::IndexarPregunta(const string& preg){
 
     list<string> tokens;    // Definimos los elementos que vamos a usar
     int pal, palParada;           
-    pal = 0;                 // Inicimos los elementos a usar
+    pal = 0;                // Inicimos los elementos a usar
     palParada = 0;
 
 
@@ -140,22 +154,23 @@ bool IndexadorHash::IndexarPregunta(const string& preg){
 
     tok.Tokenizar(preg, tokens);        // Tokenizamos la pregunta 
 
-    for(string const &token : tokens){
-        if(stopWords.find(token) != stopWords.end()){                   //Si el token es una palabra de parada
+    for(string const &token : tokens){                                                      // Recorremos los tokens de la pregunta
+        if(stopWords.find(token) != stopWords.end()){                                       // Si el token es una palabra de parada
             ++palParada;
         }
-        else{                                                           // Si el token no es una palabra de parada 
-            if(indicePregunta.find(token) != indicePregunta.end()){     // Registramos el token si es nuevo 
-                //...
+        else{                                                                               // Si el token no es una palabra de parada 
+            if(indicePregunta.find(token) == indicePregunta.end()){                         // Registramos el token si es nuevo 
+                InformacionTerminoPregunta info;
+                indicePregunta.insert({token,info});
             }
-            //...
+            indicePregunta.find(token)->second.ActualizarInfoTer(pal,almacenarPosTerm);     // Actualizamos los datos del termino
         }
         ++pal;
     }
 
-    infPregunta.set_numTotalPal(pal);
+    infPregunta.set_numTotalPal(pal);                                                       // Actualizamos los datos de infPregunta
     infPregunta.set_numTotalPalSinParada(pal - palParada); 
-    //infPregunta.set_numTotalPalDiferentes(pal);
+    infPregunta.set_numTotalPalDiferentes(indicePregunta.size());
 
     return true;
 }

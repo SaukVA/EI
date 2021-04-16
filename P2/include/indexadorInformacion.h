@@ -124,6 +124,7 @@ class InformacionTerminoPregunta {
         InformacionTerminoPregunta ();
         ~InformacionTerminoPregunta ();
         InformacionTerminoPregunta & operator= (const InformacionTerminoPregunta&);
+        void ActualizarInfoTer(const int &pos, const bool &almacenar);
 
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
     private:

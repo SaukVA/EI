@@ -2,6 +2,49 @@
 
 /************************************************************/
 /*															*/
+/*				            FECHA	    					*/
+/*															*/
+/************************************************************/
+
+Fecha::Fecha(){
+    seg = 0;
+    min = 0;
+    hora = 0;
+    dia = 0;
+    mes = 0;
+    anyo = 0;
+}
+
+Fecha::Fecha(const Fecha& f){
+    seg = f.seg;
+    min = f.min;
+    hora = f.hora;
+    dia = f.dia;
+    mes = f.mes;
+    anyo = f.anyo;
+}
+
+Fecha::Fecha(int seg, int min, int hora, int dia, int mes, int anyo){
+    this->seg = seg;
+    this->min = min;
+    this->hora = hora;
+    this->dia = dia;
+    this->mes = mes;
+    this->anyo = anyo;
+}
+
+Fecha::~Fecha(){
+    seg = 0;
+    min = 0;
+    hora = 0;
+    dia = 0;
+    mes = 0;
+    anyo = 0;
+}
+
+
+/************************************************************/
+/*															*/
 /*				         INFTERMDOC	    					*/
 /*															*/
 /************************************************************/
@@ -271,6 +314,12 @@ InformacionTerminoPregunta & InformacionTerminoPregunta::operator= (const Inform
     return *this;
 }
 
+void InformacionTerminoPregunta::ActualizarInfoTer(const int &pos, const bool &almacenar){  
+    ++ft;
+    if(almacenar){
+        posTerm.push_back(pos);
+    }
+}
 
 /************************************************************/
 /*															*/
