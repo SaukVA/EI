@@ -192,7 +192,7 @@ void IndexadorHash::IndexarDoc(const string& nom) {
 
         (*infDocumento).Set_numPal(pal);
         (*infDocumento).Set_numPalSinParada(pal - palParada);
-            sort(tokens.begin(),tokens.end());                                  //??? Funciona bien? n*log(n)
+            tokens.sort();                               //??? Funciona bien? n*log(n)
             tokens.erase(unique(tokens.begin(), tokens.end()), tokens.end());
         (*infDocumento).Set_numPalDiferentes(tokens.size());
 
