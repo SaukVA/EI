@@ -100,8 +100,106 @@ IndexadorHash& IndexadorHash::operator= (const IndexadorHash& index){
 }
 
 bool IndexadorHash::Indexar(const string& ficheroDocumentos){
-    //...
-    return false;
+
+    ifstream file;                                          //Declaramos los elementros que vamos a usar 
+    string nomFichero;
+    struct stat buffer;
+    int id;
+    InfDoc inf;
+    bool indexar;
+
+    file.open(ficheroDocumentos.c_str(),ios::binary);       // Intentamos abrir el ficheroStopWords de forma binaria
+
+    if(file){
+        stringstream strStream;                             // Creamos un stringstream para almacenar el fichero
+        strStream << file.rdbuf();                          // Volcamos el fichore en la variable
+        while (getline(strStream, nomFichero, '\n')){       // Recorremos por lineal el fichero
+
+            if(nomFichero.length() != 0 && stat(nomFichero.c_str(), &buffer) != -1 && !S_ISDIR(buffer.st_mode)){  //??? esta bien? // Comrpobamos que el nombre del ficher es correcto
+                if(indiceDocs.find(nomFichero) == indiceDocs.end()){    //Si el documento no esta indexado
+                    id = indiceDocs.size() + 1;
+                    indexar = true;
+                }
+                else{                                                   //Si el documento estaba ya indexado 
+                    if(indiceDocs.find(nomFichero)->second.Posterior()){        //??? Para comprobar la fecha estaria bien mirar los segundos
+                        id = indiceDocs.find(nomFichero)->second.Get_IdDoc();
+                        BorraDoc(nomFichero);
+                        indexar = true;
+                    }else{ 
+                        indexar = false;
+                    }
+                    cerr << "WARNING!!!: Este documento ya ha sido indexado:\t" << nomFichero << endl;
+                }
+                
+                if(indexar){
+                    inf = InfDoc();
+                    inf.Set_IdDoc(id);
+                    indiceDocs.insert({nomFichero,inf});
+                    IndexarDoc(nomFichero);
+                }
+
+            }
+            else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nomFichero << endl; }
+
+        }
+    }else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << ficheroDocumentos << endl; }
+
+    file.close();                                   // Cerramos el fichero
+
+    return true;
+}
+
+void IndexadorHash::IndexarDoc(const string& nom) {
+    
+    ifstream documento;
+    InfDoc *infDocumento;
+    int idDoc, pal, palParada;
+    struct stat doc_buffer;
+    InformacionTermino infoTerm;
+    InfTermDoc infTermDoc;
+    list<string> tokens;
+
+    //???
+    infDocumento = &indiceDocs.find(nom)->second;               // Obtenemos el documento
+    (*infDocumento).Set_tamBytes(doc_buffer.st_size);           // Almacenamos el tamaño del documento
+    idDoc = (*infDocumento).Get_IdDoc();                        // Obtenemos el id del doucumento
+
+    documento.open(nom.c_str(),ios::binary);                    // Abrimos el documento
+
+    if(documento){
+        stringstream strStream;                                 // Creamos un stringstream para almacenar el fichero
+        strStream << documento.rdbuf();                         // Volcamos el fichore en la variable
+        tok.Tokenizar(strStream.str(), tokens);                 // Sacamos los tokenes que contiene el documento 
+
+        pal = 0;
+        palParada = 0;
+        for(string token : tokens){                         // Recorremos el documento token a token 
+            if(stopWords.find(token) != stopWords.end()){   // Si no es una stopWord
+                if(Existe(token)){
+                    indice.find(token)->second.nuevaReferencia(idDoc,pal+1,almacenarPosTerm);    //Añadimos la referencia
+                }
+                else{
+                    infoTerm = InformacionTermino();                            // Creamos la informacion del termino
+                    infoTerm.nuevaReferencia(idDoc,pal+1,almacenarPosTerm);     // Agregamos la referencia al nuevo termino
+                    indice.insert({token,infoTerm});                            // Metemos el termino en el indice
+                }
+            }
+            else{                                           // Si es una stopWord
+                palParada++;
+            }
+            pal++;
+        }
+
+        (*infDocumento).Set_numPal(pal);
+        (*infDocumento).Set_numPalSinParada(pal - palParada);
+            sort(tokens.begin(),tokens.end());                                  //??? Funciona bien? n*log(n)
+            tokens.erase(unique(tokens.begin(), tokens.end()), tokens.end());
+        (*infDocumento).Set_numPalDiferentes(tokens.size());
+
+    }else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nom << endl; }
+    
+    documento.close();
+
 }
 
 bool IndexadorHash::IndexarDirectorio(const string& dirAIndexar){

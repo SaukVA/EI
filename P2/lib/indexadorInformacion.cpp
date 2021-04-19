@@ -6,13 +6,20 @@
 /*															*/
 /************************************************************/
 
+ostream& operator<<(ostream& s, const Fecha& p){
+    s << "La fecha actual es: " << p.dia << "/" << p.mes << "/" << p.anyo << " " << p.hora << ":" << p.min << ":" << p.seg << endl;
+    return s;
+}
+
 Fecha::Fecha(){
-    seg = 0;
-    min = 0;
-    hora = 0;
-    dia = 0;
-    mes = 0;
-    anyo = 0;
+    time_t now = time(0);           // Sacamos el tiempo actual
+    tm * tiempo = localtime(&now);
+    seg = tiempo->tm_sec;
+    min = tiempo->tm_min;
+    hora = tiempo->tm_hour;
+    dia = tiempo->tm_mday;
+    mes = 1 + tiempo->tm_mon;
+    anyo = 1900 + tiempo->tm_year;
 }
 
 Fecha::Fecha(const Fecha& f){
@@ -40,6 +47,37 @@ Fecha::~Fecha(){
     dia = 0;
     mes = 0;
     anyo = 0;
+}
+
+bool Fecha::Posterior(const Fecha &f)const{
+    bool resul;
+    resul = false;
+
+    if(anyo == f.anyo){
+        if(mes == f.mes){
+            if (dia == f.dia){
+                if(hora == f.hora){
+                    if(min == f.min){
+                        if(seg < f.seg){ 
+                            resul = true; 
+                        }
+                    }else if(min < f.min){
+                        resul = true; 
+                    }
+                }else if(hora < f.hora){
+                    resul = true;
+                }
+            }else if(dia < f.dia){ 
+                resul = true;
+            }
+        }else if(mes < f.mes){ 
+            resul = true;
+        }
+    }else if(anyo < f.anyo){
+        resul = true;
+    }
+
+    return resul;
 }
 
 
@@ -83,6 +121,13 @@ InfTermDoc & InfTermDoc::operator= (const InfTermDoc &inf){
 }
 
 int InfTermDoc::get_ft()const { return ft; }
+
+void InfTermDoc::NuevaReferencia(const int &pos, const bool &alm){
+    ++ft;
+    if(alm){
+        posTerm.push_back(pos);
+    }
+}
 
 
 /************************************************************/
@@ -137,6 +182,18 @@ bool InformacionTermino::ApareceEnDoc(const long int & idDoc)const{ return !(l_d
 void InformacionTermino::set_ftc(const int &ftc){ this->ftc = ftc; }
 
 int InformacionTermino::get_ftc(){ return ftc; }
+
+void InformacionTermino::nuevaReferencia(const int &doc, const int &pos, const bool &alm){
+    if(l_docs.find(doc) != l_docs.end()){
+        l_docs.find(doc)->second.NuevaReferencia(pos,alm);
+        ++ftc;
+    }
+    else{
+        l_docs.insert({doc,InfTermDoc()});
+        l_docs.find(doc)->second.NuevaReferencia(pos,alm);
+        ++ftc;
+    }
+}
 
 
 /************************************************************/
@@ -214,6 +271,29 @@ int InfDoc::Get_tamBytes()const{
     return tamBytes;
 }
 
+void InfDoc::Set_IdDoc(int const &id){
+    idDoc = id;
+}
+
+void InfDoc::Set_numPal(int const &num){
+    numPal = num;
+}
+
+void InfDoc::Set_numPalSinParada(int const &numPalSinPar){
+    numPalSinParada = numPalSinPar;
+}
+
+void InfDoc::Set_numPalDiferentes(int const &numPalDif){
+    numPalDiferentes = numPalDif;
+}
+
+void InfDoc::Set_tamBytes(int const &tam){
+    tamBytes = tam;
+}
+
+bool InfDoc::Posterior()const{
+    return fechaModificacion.Posterior(Fecha());
+}
 
 
 /************************************************************/

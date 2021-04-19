@@ -16,12 +16,13 @@ using namespace std;
 /*															*/
 /************************************************************/
 class Fecha{
-
+        friend ostream& operator<<(ostream& s, const Fecha& p);
     public:
         Fecha();
         Fecha(const Fecha& f);
         Fecha(int seg, int min, int hora, int dia, int mes, int anyo);
         ~Fecha();
+        bool Posterior(const Fecha &f)const;
     
     public:
         int seg;
@@ -46,6 +47,7 @@ class InfTermDoc {
         ~InfTermDoc ();                                 // Pone ft = 0
         InfTermDoc & operator= (const InfTermDoc &);    // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
         int get_ft ()const;                             // Nos devuelve ft
+        void NuevaReferencia(const int &pos, const bool &alm);           // Añadimos una nueva referencia
 
     private:
         int ft; // Frecuencia del término en el documento
@@ -68,6 +70,7 @@ class InformacionTermino {
         bool ApareceEnDoc(const long int &idDoc)const;                      // Nos dice si el termino aparece del documento especificado
         void set_ftc(const int & ftc);
         int get_ftc();
+        void nuevaReferencia(const int &doc, const int &pos, const bool &alm);
 
     private:
         int ftc; // Frecuencia total del término en la colección
@@ -89,6 +92,12 @@ class InfDoc {
         int Get_numPalSinParada()const;
         int Get_numPalDiferentes()const;
         int Get_tamBytes()const;
+        void Set_IdDoc(int const &id);
+        void Set_numPal(int const &num);
+        void Set_numPalSinParada(int const &numPalSinPar);
+        void Set_numPalDiferentes(int const &numPalDif);
+        void Set_tamBytes(int const &tam);
+        bool Posterior()const;
 
     private:
         long int idDoc;          // Identificador del documento. El primer documento indexado en la colección será el identificador 1

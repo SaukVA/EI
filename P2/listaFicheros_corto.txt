@@ -1,0 +1,5 @@
+corpus_corto/fichero1.txt
+corpus_corto/fichero2.txt
+corpus_corto/fichero2.txt
+corpus_corto/fichero_no_existe.txt
+corpus_corto/

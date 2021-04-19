@@ -259,6 +259,9 @@ class IndexadorHash {
         // muestra nada
         bool ListarDocs(const string& nomDoc) const;
 
+        // Indexa un documento
+        void IndexarDoc(const string& nom);
+
     private:
         // Este constructor se pone en la parte privada porque no se permitirá
         // crear un indexador sin inicializarlo convenientemente. La inicialización
