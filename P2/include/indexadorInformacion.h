@@ -116,6 +116,7 @@ class InfColeccionDocs {
         ~InfColeccionDocs ();
         InfColeccionDocs & operator= (const InfColeccionDocs &);
         void EliminarInfDoc(const InfDoc &doc);
+        void NuevaInfDoc(const int &pal, const int &palParada,const int &palDif, const int &tam);
     
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
     private:

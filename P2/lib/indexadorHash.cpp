@@ -121,21 +121,21 @@ bool IndexadorHash::Indexar(const string& ficheroDocumentos){
                     indexar = true;
                 }
                 else{                                                   //Si el documento estaba ya indexado 
-                    if(indiceDocs.find(nomFichero)->second.Posterior()){        //??? Para comprobar la fecha estaria bien mirar los segundos
-                        id = indiceDocs.find(nomFichero)->second.Get_IdDoc();
-                        BorraDoc(nomFichero);
-                        indexar = true;
+                    if(indiceDocs.find(nomFichero)->second.Posterior()){        //??? Para comprobar la fecha estaria bien mirar los segundos // Si ya se ha indexado anteriormente
+                        id = indiceDocs.find(nomFichero)->second.Get_IdDoc();   // Obtenemos el id
+                        BorraDoc(nomFichero);                                   // Borramos los datos que teniamos de antes del documento
+                        indexar = true;                                         // Indicamos que se tiene que reindexar el documento 
                     }else{ 
-                        indexar = false;
+                        indexar = false;                                        // Indicamos que NO se tiene que reindexar 
                     }
                     cerr << "WARNING!!!: Este documento ya ha sido indexado:\t" << nomFichero << endl;
                 }
                 
-                if(indexar){
-                    inf = InfDoc();
+                if(indexar){                                            // Si es necesario indexamos el documento
+                    inf = InfDoc();                                     // Añadimos el documento
                     inf.Set_IdDoc(id);
                     indiceDocs.insert({nomFichero,inf});
-                    IndexarDoc(nomFichero);
+                    IndexarDoc(nomFichero);                             // Indexamos el documento
                 }
 
             }
@@ -161,7 +161,6 @@ void IndexadorHash::IndexarDoc(const string& nom) {
 
     //???
     infDocumento = &indiceDocs.find(nom)->second;               // Obtenemos el documento
-    (*infDocumento).Set_tamBytes(doc_buffer.st_size);           // Almacenamos el tamaño del documento
     idDoc = (*infDocumento).Get_IdDoc();                        // Obtenemos el id del doucumento
 
     documento.open(nom.c_str(),ios::binary);                    // Abrimos el documento
@@ -174,7 +173,7 @@ void IndexadorHash::IndexarDoc(const string& nom) {
         pal = 0;
         palParada = 0;
         for(string token : tokens){                         // Recorremos el documento token a token 
-            if(stopWords.find(token) != stopWords.end()){   // Si no es una stopWord
+            if(stopWords.find(token) == stopWords.end()){   // Si no es una stopWord
                 if(Existe(token)){
                     indice.find(token)->second.nuevaReferencia(idDoc,pal+1,almacenarPosTerm);    //Añadimos la referencia
                 }
@@ -190,11 +189,16 @@ void IndexadorHash::IndexarDoc(const string& nom) {
             pal++;
         }
 
-        (*infDocumento).Set_numPal(pal);
+        tokens.sort();                                                      //Ajustamos los datos para colocar la informacion
+        tokens.erase(unique(tokens.begin(), tokens.end()), tokens.end());
+        stat(nom.c_str(), &doc_buffer);
+
+        (*infDocumento).Set_numPal(pal);                        //Colocamos los datos del documento
         (*infDocumento).Set_numPalSinParada(pal - palParada);
-            tokens.sort();                               //??? Funciona bien? n*log(n)
-            tokens.erase(unique(tokens.begin(), tokens.end()), tokens.end());
         (*infDocumento).Set_numPalDiferentes(tokens.size());
+
+
+        informacionColeccionDocs.NuevaInfDoc(pal, palParada, indice.size(), doc_buffer.st_size);    // Colocamos los datos del documento en la coleccion
 
     }else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nom << endl; }
     
@@ -218,7 +222,7 @@ bool IndexadorHash::IndexarDirectorio(const string& dirAIndexar){
 
 bool IndexadorHash::GuardarIndexacion() const{
     //...
-    return false;
+    return true;
 }
 
 bool IndexadorHash::RecuperarIndexacion (const string& directorioIndexacion){

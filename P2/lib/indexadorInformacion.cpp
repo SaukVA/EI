@@ -355,6 +355,14 @@ void InfColeccionDocs::EliminarInfDoc(const InfDoc &doc){
     tamBytes              -= doc.Get_tamBytes();
 }
 
+void InfColeccionDocs::NuevaInfDoc(const int &pal, const int &palParada, const int &palDif, const int &tam){
+    ++numDocs;               
+    numTotalPal += pal;           
+    numTotalPalSinParada += pal - palParada;  
+    numTotalPalDiferentes = palDif;
+    tamBytes += tam;
+}
+
 
 /************************************************************/
 /*															*/
@@ -441,7 +449,6 @@ InformacionPregunta & InformacionPregunta::operator= (const InformacionPregunta&
     }
     return *this;
 }
-
 
 void InformacionPregunta::set_numTotalPal(const int &pal){
     numTotalPal = pal;
