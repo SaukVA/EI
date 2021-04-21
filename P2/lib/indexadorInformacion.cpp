@@ -137,7 +137,7 @@ void InfTermDoc::NuevaReferencia(const int &pos, const bool &alm){
 /************************************************************/
 
 ostream& operator<<(ostream& s, const InformacionTermino& p){
-    s << "Frecuencia total: " << p.ftc << "\tdf: " << p.l_docs.size();
+    s << "Frecuencia total: " << p.ftc << "\tfd: " << p.l_docs.size();
     for(auto t = p.l_docs.begin(); t != p.l_docs.end(); ++t){
         s << "\tId.Doc: " << t->first<< "\t" << t->second;
     }
@@ -363,6 +363,19 @@ void InfColeccionDocs::NuevaInfDoc(const int &pal, const int &palParada, const i
     tamBytes += tam;
 }
 
+string InfColeccionDocs::Get_Datos()const{
+    string resul;
+
+    resul = "";
+    resul += numDocs + "\n";
+    resul += numTotalPal + "\n";
+    resul += numTotalPalSinParada + "\n";
+    resul += numTotalPalDiferentes + "\n";
+    resul += tamBytes + "\n";
+
+    return resul;
+}
+
 
 /************************************************************/
 /*															*/
@@ -417,7 +430,7 @@ void InformacionTerminoPregunta::ActualizarInfoTer(const int &pos, const bool &a
 
 ostream& operator<<(ostream& s, const InformacionPregunta& p){
     s   << "numTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: "
-        << p.numTotalPalSinParada << "\numTotlaPalDiferentes: " << p.numTotalPalDiferentes;
+        << p.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << p.numTotalPalDiferentes;
     return s;
 }
 
@@ -460,4 +473,15 @@ void InformacionPregunta::set_numTotalPalSinParada(const int &palSin){
 
 void InformacionPregunta::set_numTotalPalDiferentes(const int &palDif){
     numTotalPalDiferentes = palDif;
+}
+
+string InformacionPregunta::Get_Datos()const{
+    string resul;
+    
+    resul = "";
+    resul += numTotalPal + "\n";
+    resul += numTotalPalSinParada + "\n";
+    resul += numTotalPalDiferentes + "\n";
+
+    return resul;
 }

@@ -117,6 +117,7 @@ class InfColeccionDocs {
         InfColeccionDocs & operator= (const InfColeccionDocs &);
         void EliminarInfDoc(const InfDoc &doc);
         void NuevaInfDoc(const int &pal, const int &palParada,const int &palDif, const int &tam);
+        string Get_Datos()const;
     
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
     private:
@@ -156,6 +157,7 @@ class InformacionPregunta {
         void set_numTotalPal(const int &pal);
         void set_numTotalPalSinParada(const int &palSin);
         void set_numTotalPalDiferentes(const int &palDif);
+        string Get_Datos()const;
     
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
     private:

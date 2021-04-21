@@ -262,13 +262,12 @@ class IndexadorHash {
         // Indexa un documento
         void IndexarDoc(const string& nom);
 
-        IndexadorHash();
 
     private:
         // Este constructor se pone en la parte privada porque no se permitirá
         // crear un indexador sin inicializarlo convenientemente. La inicialización
         // la decidirá el alumno
-        
+        IndexadorHash();
 
         // Índice de términos indexados accesible por el término
         unordered_map<string, InformacionTermino> indice;

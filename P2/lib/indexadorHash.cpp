@@ -25,7 +25,7 @@ IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimita
         strStream << file.rdbuf();                  // Volcamos el fichore en la variable
         while (getline(strStream, str, '\n')){      // Recorremos por lineal el fichero
             if(str.length() != 0){
-                stopWords.insert(str);              //??? Con esto sobra?
+                stopWords.insert(str);              //??? Con esto sobra? // Guardamos la palabra de parada
             }
         }
     }
@@ -142,7 +142,8 @@ bool IndexadorHash::Indexar(const string& ficheroDocumentos){
             else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nomFichero << endl; }
 
         }
-    }else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << ficheroDocumentos << endl; }
+    }
+    else{ cerr << "ERROR!!!: No se ha podido abrir el archivo :\t" << ficheroDocumentos << endl; }
 
     file.close();                                   // Cerramos el fichero
 
@@ -158,10 +159,14 @@ void IndexadorHash::IndexarDoc(const string& nom) {
     InformacionTermino infoTerm;
     InfTermDoc infTermDoc;
     list<string> tokens;
+    string delimitadores;
 
-    //???
     infDocumento = &indiceDocs.find(nom)->second;               // Obtenemos el documento
     idDoc = (*infDocumento).Get_IdDoc();                        // Obtenemos el id del doucumento
+    pal = 0;
+    palParada = 0;
+    delimitadores = tok.DelimitadoresPalabra();
+    tok.DelimitadoresPalabra(delimitadores + "\n");
 
     documento.open(nom.c_str(),ios::binary);                    // Abrimos el documento
 
@@ -170,16 +175,14 @@ void IndexadorHash::IndexarDoc(const string& nom) {
         strStream << documento.rdbuf();                         // Volcamos el fichore en la variable
         tok.Tokenizar(strStream.str(), tokens);                 // Sacamos los tokenes que contiene el documento 
 
-        pal = 0;
-        palParada = 0;
         for(string token : tokens){                         // Recorremos el documento token a token 
             if(stopWords.find(token) == stopWords.end()){   // Si no es una stopWord
                 if(Existe(token)){
-                    indice.find(token)->second.nuevaReferencia(idDoc,pal+1,almacenarPosTerm);    //Añadimos la referencia
+                    indice.find(token)->second.nuevaReferencia(idDoc,pal,almacenarPosTerm);    //Añadimos la referencia
                 }
                 else{
                     infoTerm = InformacionTermino();                            // Creamos la informacion del termino
-                    infoTerm.nuevaReferencia(idDoc,pal+1,almacenarPosTerm);     // Agregamos la referencia al nuevo termino
+                    infoTerm.nuevaReferencia(idDoc,pal,almacenarPosTerm);     // Agregamos la referencia al nuevo termino
                     indice.insert({token,infoTerm});                            // Metemos el termino en el indice
                 }
             }
@@ -192,11 +195,12 @@ void IndexadorHash::IndexarDoc(const string& nom) {
         tokens.sort();                                                      //Ajustamos los datos para colocar la informacion
         tokens.erase(unique(tokens.begin(), tokens.end()), tokens.end());
         stat(nom.c_str(), &doc_buffer);
+        tok.DelimitadoresPalabra(delimitadores);
 
         (*infDocumento).Set_numPal(pal);                        //Colocamos los datos del documento
         (*infDocumento).Set_numPalSinParada(pal - palParada);
         (*infDocumento).Set_numPalDiferentes(tokens.size());
-
+        (*infDocumento).Set_tamBytes(doc_buffer.st_size);
 
         informacionColeccionDocs.NuevaInfDoc(pal, palParada, indice.size(), doc_buffer.st_size);    // Colocamos los datos del documento en la coleccion
 
@@ -221,7 +225,69 @@ bool IndexadorHash::IndexarDirectorio(const string& dirAIndexar){
 }
 
 bool IndexadorHash::GuardarIndexacion() const{
-    //...
+
+    // ----> Datos a Guardar <----
+    // Fichero: datos_simples.txt
+    //      string pregunta;
+    //      string ficheroStopWords;
+    //      string directorioIndice;
+    //      int tipoStemmer;
+    //      bool almacenarEnDisco;
+    //      bool almacenarPosTerm;
+    //      InfColeccionDocs informacionColeccionDocs;
+    //          |--->numDocs
+    //          |--->numTotalPal
+    //          |--->numTotalPalSinParada
+    //          |--->numTotalPalDiferentes
+    //          |--->tamBytes
+    //      InformacionPregunta infPregunta;
+    //          |--->numTotalPal
+    //          |--->numTotalPalSinParada
+    //          |--->numTotalPalDiferentes
+    //      Tokenizador tok;
+    //          |--->CasosEspeciales
+    //          |--->Delimitadores
+    //          |--->PasarAminusculas
+    //      unordered_set<string> stopWords;
+    //          |--->...
+    // Fichero: indice.txt
+    //      unordered_map<string, InformacionTermino> indice;
+    // Fichero: indiceDocs.txt
+    //      unordered_map<string, InfDoc> indiceDocs;
+    // Fichero: indicePregunta.txt
+    //      unordered_map<string, InformacionTerminoPregunta> indicePregunta;
+        
+    ofstream archivo;
+    string temp, nombre_fichero;
+
+    temp = "";
+    nombre_fichero = "datos_simples.txt";
+
+    archivo.open(nombre_fichero, std::ios::binary);
+
+    if(archivo){
+        temp += pregunta + "\n";
+        temp += ficheroStopWords + "\n";
+        temp += directorioIndice + "\n";
+        temp += tipoStemmer + "\n";
+        temp += almacenarEnDisco + "\n";
+        temp += almacenarPosTerm + "\n";
+        temp += informacionColeccionDocs.Get_Datos();
+        temp += infPregunta.Get_Datos();
+        temp += tok.CasosEspeciales() + "\n";
+        temp += tok.DelimitadoresPalabra() + "\n";
+        temp += tok.PasarAminuscSinAcentos() + "\n";
+        for(string word : stopWords){
+            temp += word + "\n";
+        }
+
+        archivo << temp;
+
+        //... guardar los otros dos ficheros
+
+    }
+    else{ cerr << "ERROR!!!: No se ha podido crear el fichero " + nombre_fichero; }
+
     return true;
 }
 
