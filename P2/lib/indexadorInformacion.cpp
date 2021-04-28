@@ -129,6 +129,13 @@ void InfTermDoc::NuevaReferencia(const int &pos, const bool &alm){
     }
 }
 
+void InfTermDoc::set_ft(const int &ft){
+    this->ft = ft;
+}
+
+void InfTermDoc::set_posTerm(const list<int> &posTerm){
+    this->posTerm = posTerm;
+}
 
 /************************************************************/
 /*															*/
@@ -181,6 +188,8 @@ bool InformacionTermino::ApareceEnDoc(const long int & idDoc)const{ return !(l_d
 
 void InformacionTermino::set_ftc(const int &ftc){ this->ftc = ftc; }
 
+void InformacionTermino::set_l_docs(const unordered_map<long int, InfTermDoc> &l_docs){ this->l_docs = l_docs; }
+
 int InformacionTermino::get_ftc(){ return ftc; }
 
 void InformacionTermino::nuevaReferencia(const int &doc, const int &pos, const bool &alm){
@@ -192,6 +201,13 @@ void InformacionTermino::nuevaReferencia(const int &doc, const int &pos, const b
         l_docs.insert({doc,InfTermDoc()});
         l_docs.find(doc)->second.NuevaReferencia(pos,alm);
         ++ftc;
+    }
+}
+
+void InformacionTermino::eliminarReferencia(const int &doc){
+    if(l_docs.find(doc) != l_docs.end()){
+        ftc -= l_docs.find(doc)->second.get_ft();
+        l_docs.erase(doc);
     }
 }
 
@@ -347,11 +363,11 @@ InfColeccionDocs & InfColeccionDocs::operator= (const InfColeccionDocs &info){
     return *this;
 }
 
-void InfColeccionDocs::EliminarInfDoc(const InfDoc &doc){
+void InfColeccionDocs::EliminarInfDoc(const InfDoc &doc, const int& paldif){
     --numDocs;
     numTotalPal           -= doc.Get_numPal();
     numTotalPalSinParada  -= doc.Get_numPalSinParada();
-    numTotalPalDiferentes -= doc.Get_numPalDiferentes();
+    numTotalPalDiferentes -= paldif;
     tamBytes              -= doc.Get_tamBytes();
 }
 
@@ -367,14 +383,24 @@ string InfColeccionDocs::Get_Datos()const{
     string resul;
 
     resul = "";
-    resul += numDocs + "\n";
-    resul += numTotalPal + "\n";
-    resul += numTotalPalSinParada + "\n";
-    resul += numTotalPalDiferentes + "\n";
-    resul += tamBytes + "\n";
+    resul += to_string(numDocs) + "\n";
+    resul += to_string(numTotalPal) + "\n";
+    resul += to_string(numTotalPalSinParada) + "\n";
+    resul += to_string(numTotalPalDiferentes) + "\n";
+    resul += to_string(tamBytes) + "\n";
 
     return resul;
 }
+
+void InfColeccionDocs::Set_numDocs(const int &val){ numDocs = val;}
+
+void InfColeccionDocs::Set_numTotalPal(const int &val){ numTotalPal = val;}
+
+void InfColeccionDocs::Set_numTotalPalSinParada(const int &val){ numTotalPalSinParada = val;}
+
+void InfColeccionDocs::Set_numTotalPalDiferentes(const int &val){ numTotalPalDiferentes = val;}
+
+void InfColeccionDocs::Set_tamBytes(const int &val){ tamBytes = val;}
 
 
 /************************************************************/
@@ -421,6 +447,11 @@ void InformacionTerminoPregunta::ActualizarInfoTer(const int &pos, const bool &a
         posTerm.push_back(pos);
     }
 }
+
+void InformacionTerminoPregunta::set_ft(const int &ft){ this->ft = ft; }
+
+void InformacionTerminoPregunta::set_posTerm(const list<int> &posTerm){ this->posTerm = posTerm; }
+
 
 /************************************************************/
 /*															*/
@@ -479,9 +510,9 @@ string InformacionPregunta::Get_Datos()const{
     string resul;
     
     resul = "";
-    resul += numTotalPal + "\n";
-    resul += numTotalPalSinParada + "\n";
-    resul += numTotalPalDiferentes + "\n";
+    resul += to_string(numTotalPal) + "\n";
+    resul += to_string(numTotalPalSinParada) + "\n";
+    resul += to_string(numTotalPalDiferentes) + "\n";
 
     return resul;
 }

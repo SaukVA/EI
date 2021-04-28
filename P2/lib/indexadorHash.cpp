@@ -47,7 +47,150 @@ IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimita
 }
 
 IndexadorHash::IndexadorHash(const string& directorioIndexacion){
-    //...
+    
+    ifstream documento;
+    string nombre_fichero, linea, termino;
+    unordered_map<long int,InfTermDoc> l_d;
+    list<int> l;
+    list<string> l_linea;
+    stringstream datos, d_indice, d_indiceDoc, d_indicePregunta;
+    InfTermDoc infTermDoc;
+    InformacionTermino infTer;
+    InformacionTerminoPregunta infTermPre;
+    InfDoc infDoc;
+    Tokenizador token;
+
+    int temp, idDoc, ft;
+    bool aux;
+
+    nombre_fichero = "";
+    linea = "";
+    token.DelimitadoresPalabra("\t ");
+
+    for (int i = 0; i < 4; i++){
+        switch (i){
+            case 0:     // datos_simples.txt
+                nombre_fichero = directorioIndexacion + "/datos_simples.txt";
+                documento.open(nombre_fichero.c_str(),ios::binary);
+                if(documento){ datos << documento.rdbuf(); }
+                else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nombre_fichero << endl; }
+                documento.close();
+                
+                temp = 0;
+                stopWords.clear();
+                while (getline(datos, linea, '\n')){
+                    switch (temp){
+                        case 0:pregunta = linea; break;
+                        case 1:ficheroStopWords = linea; break;
+                        case 2:directorioIndice = linea; break;
+                        case 3:tipoStemmer = stoi(linea); break;
+                        case 4:istringstream(linea) >> almacenarEnDisco; break;
+                        case 5:istringstream(linea) >> almacenarPosTerm; break;
+                        case 6:informacionColeccionDocs.Set_numDocs(stoi(linea)); break;                        
+                        case 7:informacionColeccionDocs.Set_numTotalPal(stoi(linea)); break;
+                        case 8:informacionColeccionDocs.Set_numTotalPalSinParada(stoi(linea)); break;
+                        case 9:informacionColeccionDocs.Set_numTotalPalDiferentes(stoi(linea)); break;
+                        case 10:informacionColeccionDocs.Set_tamBytes(stoi(linea)); break;
+                        case 11:infPregunta.set_numTotalPal(stoi(linea)); break;
+                        case 12:infPregunta.set_numTotalPalSinParada(stoi(linea)); break;
+                        case 13:infPregunta.set_numTotalPalDiferentes(stoi(linea)); break;
+                        case 14:istringstream(linea) >> aux; tok.CasosEspeciales(aux); break;
+                        case 15:istringstream(linea) >> aux; tok.PasarAminuscSinAcentos(aux); break;
+                        case 16:tok.DelimitadoresPalabra(linea); break;                       
+                        default: stopWords.insert(linea); break;
+                    }
+                    ++temp;
+                }
+                break;
+            case 1:     // indice.txt
+                nombre_fichero = directorioIndexacion + "/indice.txt";
+                documento.open(nombre_fichero.c_str(),ios::binary);
+                if(documento){ d_indice << documento.rdbuf(); }
+                else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nombre_fichero << endl; }
+                documento.close();
+
+                indice.clear();
+                while (getline(d_indice, linea, '\n')){
+                    l.clear();
+                    l_d.clear();
+                    token.Tokenizar(linea, l_linea);
+                    auto it = l_linea.begin();              // pal2	Frecuencia total: 3	fd: 2	Id.Doc: 2	ft: 2	0	2	Id.Doc: 1	ft: 1	2
+                    termino = *it;                          // pal2
+                    ++it; ++it; ++it;                       // Frecuencia total:
+                    infTer.set_ftc(stoi((*it).c_str()));    // 3
+                    ++it; ++it; ++it;                       // fd: 2
+                    while(it != l_linea.end()){
+                        l.clear();
+                        ++it;                               // Id.Doc:
+                        idDoc = stoi((*it).c_str());        // 2, 3
+                        ++it; ++it;                         // ft:
+                        ft = stoi((*it).c_str());           // 2, 1
+                        ++it;
+                        while(it != l_linea.end() && *it != "Id.Doc:"){
+                            l.push_back(stoi((*it).c_str()));      // 0, 2, 2
+                            ++it;
+                        }
+                        infTermDoc.set_ft(ft);
+                        infTermDoc.set_posTerm(l);
+                        l_d.insert({idDoc,infTermDoc});
+                    }
+                    infTer.set_l_docs(l_d);
+                    indice.insert({termino, infTer});                    
+                }
+                break;
+            case 2:     // indiceDocs.txt
+                nombre_fichero = directorioIndexacion + "/indiceDocs.txt";
+                documento.open(nombre_fichero.c_str(),ios::binary);
+                if(documento){ d_indiceDoc << documento.rdbuf(); }
+                else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nombre_fichero << endl; }
+                documento.close();
+
+                indiceDocs.clear();
+                while (getline(d_indiceDoc,linea, '\n')){
+                    token.Tokenizar(linea, l_linea);
+                    auto it = l_linea.begin();              //corpus_corto/fichero2.txt	idDoc: 2	numPal: 5	numPalSinParada: 3	numPalDiferentes: 2	tamBytes: 23
+                    termino = *it;                          //corpus_corto/fichero2.txt
+                    ++it; ++it;                             //idDoc:
+                    infDoc.Set_IdDoc(stoi((*it).c_str()));            // 2
+                    ++it; ++it;                             // numPal:
+                    infDoc.Set_numPal(stoi((*it).c_str()));           // 5
+                    ++it; ++it;                             // numPalSinParada:
+                    infDoc.Set_numPalSinParada(stoi((*it).c_str()));  // 3
+                    ++it; ++it;                             // numPalDiferente:
+                    infDoc.Set_numPalDiferentes(stoi((*it).c_str())); // 2
+                    ++it; ++it;                             // tamBytes:
+                    infDoc.Set_tamBytes(stoi((*it).c_str()));         // 23
+                    indiceDocs.insert({termino,infDoc});
+                }
+                break;
+            case 3:
+                nombre_fichero = directorioIndexacion + "/indicePregunta.txt";
+                documento.open(nombre_fichero.c_str(),ios::binary);
+                if(documento){ d_indicePregunta << documento.rdbuf(); }
+                else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nombre_fichero << endl; }
+                documento.close();
+
+                indiceDocs.clear();
+                while (getline(d_indicePregunta,linea, '\n')){
+                    l.clear();
+                    token.Tokenizar(linea, l_linea);
+                    auto it = l_linea.begin();              // hace?	ft: 4	2	5	8	11
+                    termino = *it;                          // hace?
+                    ++it; ++it;                             // ft:
+                    infTermPre.set_ft(stoi((*it).c_str())); // 4
+                    ++it;
+                    while(it != l_linea.end()){
+                        l.push_back(stoi((*it).c_str()));   // 2, 5, 8, 11
+                        ++it;
+                    }
+                    infTermPre.set_posTerm(l);
+                    indicePregunta.insert({termino, infTermPre});
+                }
+                break;
+        }
+    }
+    
+    
 }
 
 IndexadorHash::IndexadorHash(const IndexadorHash& index){
@@ -160,12 +303,13 @@ void IndexadorHash::IndexarDoc(const string& nom) {
     InfTermDoc infTermDoc;
     list<string> tokens;
     string delimitadores;
+    unordered_set<string>dif;
 
     infDocumento = &indiceDocs.find(nom)->second;               // Obtenemos el documento
     idDoc = (*infDocumento).Get_IdDoc();                        // Obtenemos el id del doucumento
     pal = 0;
     palParada = 0;
-    delimitadores = tok.DelimitadoresPalabra();
+    delimitadores = tok.DelimitadoresPalabra();                 // ??? vale o lo tengo que hacer con los ficheros 
     tok.DelimitadoresPalabra(delimitadores + "\n");
 
     documento.open(nom.c_str(),ios::binary);                    // Abrimos el documento
@@ -182,9 +326,10 @@ void IndexadorHash::IndexarDoc(const string& nom) {
                 }
                 else{
                     infoTerm = InformacionTermino();                            // Creamos la informacion del termino
-                    infoTerm.nuevaReferencia(idDoc,pal,almacenarPosTerm);     // Agregamos la referencia al nuevo termino
+                    infoTerm.nuevaReferencia(idDoc,pal,almacenarPosTerm);       // Agregamos la referencia al nuevo termino
                     indice.insert({token,infoTerm});                            // Metemos el termino en el indice
                 }
+                if(dif.find(token) == dif.end()){ dif.insert(token); }          // Si no hemos visto la palabra la añadimos 
             }
             else{                                           // Si es una stopWord
                 palParada++;
@@ -192,14 +337,12 @@ void IndexadorHash::IndexarDoc(const string& nom) {
             pal++;
         }
 
-        tokens.sort();                                                      //Ajustamos los datos para colocar la informacion
-        tokens.erase(unique(tokens.begin(), tokens.end()), tokens.end());
         stat(nom.c_str(), &doc_buffer);
         tok.DelimitadoresPalabra(delimitadores);
 
         (*infDocumento).Set_numPal(pal);                        //Colocamos los datos del documento
         (*infDocumento).Set_numPalSinParada(pal - palParada);
-        (*infDocumento).Set_numPalDiferentes(tokens.size());
+        (*infDocumento).Set_numPalDiferentes(dif.size());
         (*infDocumento).Set_tamBytes(doc_buffer.st_size);
 
         informacionColeccionDocs.NuevaInfDoc(pal, palParada, indice.size(), doc_buffer.st_size);    // Colocamos los datos del documento en la coleccion
@@ -246,8 +389,8 @@ bool IndexadorHash::GuardarIndexacion() const{
     //          |--->numTotalPalDiferentes
     //      Tokenizador tok;
     //          |--->CasosEspeciales
-    //          |--->Delimitadores
     //          |--->PasarAminusculas
+    //          |--->Delimitadores
     //      unordered_set<string> stopWords;
     //          |--->...
     // Fichero: indice.txt
@@ -259,35 +402,66 @@ bool IndexadorHash::GuardarIndexacion() const{
         
     ofstream archivo;
     string temp, nombre_fichero;
+    stringstream aux;
+    struct stat dir;
+    int err;
 
     temp = "";
-    nombre_fichero = "datos_simples.txt";
+    nombre_fichero = "";
+    err = stat(directorioIndice.c_str(), &dir);
 
-    archivo.open(nombre_fichero, std::ios::binary);
+    if(err==-1 || !S_ISDIR(dir.st_mode)){       // Comprobamos que exista el directorio y si no lo creamos 
+		string cmd="mkdir "+directorioIndice; 
+		system(cmd.c_str()); 
+	}
 
-    if(archivo){
-        temp += pregunta + "\n";
-        temp += ficheroStopWords + "\n";
-        temp += directorioIndice + "\n";
-        temp += tipoStemmer + "\n";
-        temp += almacenarEnDisco + "\n";
-        temp += almacenarPosTerm + "\n";
-        temp += informacionColeccionDocs.Get_Datos();
-        temp += infPregunta.Get_Datos();
-        temp += tok.CasosEspeciales() + "\n";
-        temp += tok.DelimitadoresPalabra() + "\n";
-        temp += tok.PasarAminuscSinAcentos() + "\n";
-        for(string word : stopWords){
-            temp += word + "\n";
+    for (size_t i = 0; i < 4; ++i){
+        switch (i){
+            case 0: // datos_simples.txt
+                nombre_fichero = directorioIndice + "/datos_simples.txt";
+                aux << pregunta + "\n";
+                aux << ficheroStopWords + "\n";
+                aux << directorioIndice + "\n";
+                aux << to_string(tipoStemmer) + "\n";
+                aux << to_string(almacenarEnDisco) + "\n";
+                aux << to_string(almacenarPosTerm) + "\n";
+                aux << informacionColeccionDocs.Get_Datos();
+                aux << infPregunta.Get_Datos();
+                aux << to_string(tok.CasosEspeciales()) + "\n";
+                aux << to_string(tok.PasarAminuscSinAcentos()) + "\n";
+                aux << tok.DelimitadoresPalabra() + "\n";
+                for(string word : stopWords){
+                    aux << word + "\n";
+                }
+                break;
+            case 1: //indice.txt
+                nombre_fichero = directorioIndice + "/indice.txt";
+                for(auto it = indice.begin(); it != indice.end(); ++it){
+                    aux << it->first << "\t" << it->second << endl;
+                }
+                break;
+            case 2: // indiceDocs.txt
+                nombre_fichero = directorioIndice + "/indiceDocs.txt";
+                for(auto it = indiceDocs.begin(); it != indiceDocs.end(); ++it){
+                    aux << it->first << "\t" << it->second << endl;
+                }
+                break;
+            case 3: // indicePregunta.txt
+                nombre_fichero = directorioIndice + "/indicePregunta.txt";
+                for(auto it = indicePregunta.begin(); it != indicePregunta.end(); ++it){
+                    aux << it->first << "\t" << it->second << endl;
+                }
+                break;
         }
 
-        archivo << temp;
-
-        //... guardar los otros dos ficheros
+        archivo.open(nombre_fichero, std::ios::binary);
+        if(archivo){ archivo << aux.str(); }
+        else{ cerr << "ERROR!!!: No se ha podido crear el fichero " + nombre_fichero; }
+        archivo.close();
+        aux.str("");
 
     }
-    else{ cerr << "ERROR!!!: No se ha podido crear el fichero " + nombre_fichero; }
-
+    
     return true;
 }
 
@@ -415,16 +589,16 @@ bool IndexadorHash::BorraDoc(const string& nomDoc){
 
         for(auto it = indice.begin(); it != indice.end(); ++it){                            // Recorremos cada uno de los terminos
             if(it->second.ApareceEnDoc(idDoc)){                                             // Si el termino aparece en el documento
-                int newFtc;
-                newFtc = it->second.get_ftc() - it->second.Devolver_Info(idDoc).get_ft();   // Calculamos el nuevo ftc del termino
-                it->second.set_ftc(newFtc);                                                 // Lo asignamos 
-                if(newFtc == 0){                                                            //??? Se deberia de borrar el termino si se queda sin ninguna referencia?
-                    Borra(it->first);
-                }
+                it->second.eliminarReferencia(idDoc);
             }
         }
 
-        informacionColeccionDocs.EliminarInfDoc(docInfo);                                   // Eliminamos los datos del documento del registro
+        reset:                                                                              //Borramos los terminos que ya no son necesarios 
+        for(auto it2 = indice.begin(); it2 != indice.end(); ++it2){
+            if(it2->second.get_ftc() == 0){ Borra(it2->first); goto reset; }
+        }
+
+        informacionColeccionDocs.EliminarInfDoc(docInfo,indice.size());                                   // Eliminamos los datos del documento del registro
         return (indiceDocs.erase(nomDoc) != 0);                                             // Eliminamos el documento
     }
     return false;
