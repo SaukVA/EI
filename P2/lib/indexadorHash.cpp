@@ -141,7 +141,7 @@ IndexadorHash::IndexadorHash(const string& directorioIndexacion){
             case 2:     // indiceDocs.txt
                 nombre_fichero = directorioIndexacion + "/indiceDocs.txt";
                 documento.open(nombre_fichero.c_str(),ios::binary);
-                if(documento){ d_indiceDoc << documento.rdbuf(); }
+                if(documento){ d_indiceDoc << documento.rdbuf();}
                 else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nombre_fichero << endl; }
                 documento.close();
 
@@ -163,14 +163,14 @@ IndexadorHash::IndexadorHash(const string& directorioIndexacion){
                     indiceDocs.insert({termino,infDoc});
                 }
                 break;
-            case 3:
+            case 3:     // indicePregunta.txt
                 nombre_fichero = directorioIndexacion + "/indicePregunta.txt";
                 documento.open(nombre_fichero.c_str(),ios::binary);
                 if(documento){ d_indicePregunta << documento.rdbuf(); }
                 else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nombre_fichero << endl; }
                 documento.close();
 
-                indiceDocs.clear();
+                indicePregunta.clear();
                 while (getline(d_indicePregunta,linea, '\n')){
                     l.clear();
                     token.Tokenizar(linea, l_linea);
@@ -303,28 +303,31 @@ void IndexadorHash::IndexarDoc(const string& nom) {
     InfTermDoc infTermDoc;
     list<string> tokens;
     string delimitadores;
+    stemmerPorter stm;
     unordered_set<string>dif;
 
-    infDocumento = &indiceDocs.find(nom)->second;               // Obtenemos el documento
-    idDoc = (*infDocumento).Get_IdDoc();                        // Obtenemos el id del doucumento
+  	//Iniciamos las variables
+    infDocumento = &indiceDocs.find(nom)->second;
+    idDoc = (*infDocumento).Get_IdDoc();
     pal = 0;
     palParada = 0;
-    delimitadores = tok.DelimitadoresPalabra();                 // ??? vale o lo tengo que hacer con los ficheros 
-    tok.DelimitadoresPalabra(delimitadores + "\n");
+    delimitadores = tok.DelimitadoresPalabra(); 
+    tok.DelimitadoresPalabra(delimitadores + "\n");	// Añadimos '\n' para poder tokenizar todo el fichero 
 
-    documento.open(nom.c_str(),ios::binary);                    // Abrimos el documento
+    documento.open(nom.c_str(),ios::binary);		// Abrimos el documento
 
     if(documento){
-        stringstream strStream;                                 // Creamos un stringstream para almacenar el fichero
-        strStream << documento.rdbuf();                         // Volcamos el fichore en la variable
-        tok.Tokenizar(strStream.str(), tokens);                 // Sacamos los tokenes que contiene el documento 
+        stringstream strStream;						// Creamos un stringstream para almacenar el fichero
+        strStream << documento.rdbuf();				// Volcamos el fichore en la variable
+        tok.Tokenizar(strStream.str(), tokens);		// Sacamos los tokenes que contiene el documento 
 
-        for(string token : tokens){                         // Recorremos el documento token a token 
+        for(string token : tokens){					// Recorremos el documento token a token 
+            stm.stemmer(token, tipoStemmer);				// Aplicamos la Stematizacion al token 
             if(stopWords.find(token) == stopWords.end()){   // Si no es una stopWord
-                if(Existe(token)){
-                    indice.find(token)->second.nuevaReferencia(idDoc,pal,almacenarPosTerm);    //Añadimos la referencia
+                if(Existe(token)){																// Si existe la palabra
+                    indice.find(token)->second.nuevaReferencia(idDoc,pal,almacenarPosTerm);		//Añadimos la referencia
                 }
-                else{
+                else{															// Si NO existe la palabra 
                     infoTerm = InformacionTermino();                            // Creamos la informacion del termino
                     infoTerm.nuevaReferencia(idDoc,pal,almacenarPosTerm);       // Agregamos la referencia al nuevo termino
                     indice.insert({token,infoTerm});                            // Metemos el termino en el indice
@@ -337,15 +340,17 @@ void IndexadorHash::IndexarDoc(const string& nom) {
             pal++;
         }
 
-        stat(nom.c_str(), &doc_buffer);
-        tok.DelimitadoresPalabra(delimitadores);
+        stat(nom.c_str(), &doc_buffer);				// Colocamod el tmaño del documento en el buffer
+        tok.DelimitadoresPalabra(delimitadores);	// Dejamos los delimitadores como estaban 
 
-        (*infDocumento).Set_numPal(pal);                        //Colocamos los datos del documento
+      	//Colocamos los datos del documento
+        (*infDocumento).Set_numPal(pal);                        
         (*infDocumento).Set_numPalSinParada(pal - palParada);
         (*infDocumento).Set_numPalDiferentes(dif.size());
         (*infDocumento).Set_tamBytes(doc_buffer.st_size);
-
-        informacionColeccionDocs.NuevaInfDoc(pal, palParada, indice.size(), doc_buffer.st_size);    // Colocamos los datos del documento en la coleccion
+		
+      	// Colocamos los datos del documento en la coleccion
+        informacionColeccionDocs.NuevaInfDoc(pal, palParada, indice.size(), doc_buffer.st_size);    
 
     }else{ cerr << "ERROR!!!: No se ha podido abrir el archivo:\t" << nom << endl; }
     

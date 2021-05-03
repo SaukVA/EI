@@ -48,6 +48,8 @@ class InfTermDoc {
         InfTermDoc & operator= (const InfTermDoc &);    // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
         int get_ft ()const;                             // Nos devuelve ft
         void NuevaReferencia(const int &pos, const bool &alm);           // Añadimos una nueva referencia
+        void set_ft(const int &ft);
+        void set_posTerm(const list<int> &posTerm);
 
     private:
         int ft; // Frecuencia del término en el documento
@@ -69,8 +71,10 @@ class InformacionTermino {
         InfTermDoc Devolver_Info(const long int &idDoc) const;              // Dado el id de un documento devuelve la informacion del termino en el documento o vacio
         bool ApareceEnDoc(const long int &idDoc)const;                      // Nos dice si el termino aparece del documento especificado
         void set_ftc(const int & ftc);
+        void set_l_docs(const unordered_map<long int, InfTermDoc> &l_docs);
         int get_ftc();
         void nuevaReferencia(const int &doc, const int &pos, const bool &alm);
+        void eliminarReferencia(const int &doc);
 
     private:
         int ftc; // Frecuencia total del término en la colección
@@ -115,9 +119,14 @@ class InfColeccionDocs {
         InfColeccionDocs ();
         ~InfColeccionDocs ();
         InfColeccionDocs & operator= (const InfColeccionDocs &);
-        void EliminarInfDoc(const InfDoc &doc);
+        void EliminarInfDoc(const InfDoc &doc, const int& paldif);
         void NuevaInfDoc(const int &pal, const int &palParada,const int &palDif, const int &tam);
         string Get_Datos()const;
+        void Set_numDocs(const int &val);
+        void Set_numTotalPal(const int &val);
+        void Set_numTotalPalSinParada(const int &val);
+        void Set_numTotalPalDiferentes(const int &val);
+        void Set_tamBytes(const int &val);
     
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
     private:
@@ -136,6 +145,8 @@ class InformacionTerminoPregunta {
         ~InformacionTerminoPregunta ();
         InformacionTerminoPregunta & operator= (const InformacionTerminoPregunta&);
         void ActualizarInfoTer(const int &pos, const bool &almacenar);
+        void set_ft(const int &ft);
+        void set_posTerm(const list<int> &posTerm);
 
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
     private:
